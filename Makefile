@@ -11,12 +11,24 @@ LD=~/.local/binutils/bin/i386-unkown-linux-gnu-ld
 # Virtual machine
 QEMU=qemu-system-i386
 
+GCC=gcc
+
+CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
+         -Wall -Wextra -Werror -c
+
+ASFLAGS = -f elf
+
 all: os.iso
 
-loader.o: loader.s
-	$(NASM) -f elf -o $@ $< # Assemble loader into a 32-bit ELF object file
+%.o: %.c
+	# Compile c files with gcc
+	$(GCC) $(CFLAGS)  $< -o $@
 
-kernel.elf: loader.o	
+%.o: %.s
+	# assemble s files wiht nasm
+	$(NASM) $(ASFLAGS) $< -o $@
+
+kernel.elf: loader.o kmain.o
 	$(LD) -T link.ld -melf_i386 loader.o -o kernel.elf # Link to make an executable for the kernel.
 
 os.iso: kernel.elf

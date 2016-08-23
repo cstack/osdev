@@ -4,6 +4,9 @@ global loader                   ; the entry symbol for ELF
                                 ; at the start of the file. 'global' exports and
                                 ; 'extern' imports.
 
+extern kmain                    ; the starting point in our C code
+
+
 MAGIC_NUMBER equ 0x1BADB002     ; define the magic number constant
                                 ; 'equ' is a pseduo-instruction which does not
                                 ; correspond to an x86 instruction. This one
@@ -41,17 +44,10 @@ loader:                         ; the loader label (defined as entry point in li
 
     mov esp, kernel_stack + KERNEL_STACK_SIZE   ; point esp to the start of the
                                                 ; stack (end of memory area)
-                                                ; 0x(background)(foreground)(ascii)
-    mov word [0x000B8000], 0x2848               ; H
-    mov word [0x000B8002], 0x2845               ; E
-    mov word [0x000B8004], 0x284C               ; L
-    mov word [0x000B8006], 0x284C               ; L
-    mov word [0x000B8008], 0x284F               ; O
-    mov word [0x000B800A], 0x2821               ; !
-.loop:
-    jmp .loop                   ; loop forever
+
+    jmp kmain
 
 section .bss:                   ; Use the 'bss' section for the stack
-align 4                         ; align at 4 bytes for performance reasons
-kernel_stack:                   ; label points to beginning of memory
-    resb KERNEL_STACK_SIZE      ; reserve stack for the kernel
+    align 4                         ; align at 4 bytes for performance reasons
+    kernel_stack:                   ; label points to beginning of memory
+        resb KERNEL_STACK_SIZE      ; reserve stack for the kernel

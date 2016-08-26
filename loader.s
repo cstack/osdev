@@ -21,7 +21,7 @@ CHECKSUM     equ -MAGIC_NUMBER  ; calculate the checksum
 
 KERNEL_STACK_SIZE equ 4096      ; size of stack in bytes (1 kilobyte)
 
-section .text:                  ; start of the text (code) section
+section .text                   ; start of the text (code) section
                                 ; .data is for initialized variables
                                 ; .bss is for uninitialized variables
 
@@ -47,7 +47,7 @@ loader:                         ; the loader label (defined as entry point in li
 
     jmp kmain
 
-section .bss:                   ; Use the 'bss' section for the stack
+section .bss                        ; Use the 'bss' section for the stack
     align 4                         ; align at 4 bytes for performance reasons
     kernel_stack:                   ; label points to beginning of memory
         resb KERNEL_STACK_SIZE      ; reserve stack for the kernel

@@ -45,13 +45,17 @@ void fb_clear_screen()
   }
 }
 
+void fb_print(char * s, unsigned char fg, unsigned char bg) {
+  int i = 0;
+  while (s[i]) {
+    fb_write_cell(i, s[i], fg, bg);
+    i++;
+  }
+}
+
 void kmain() {
   fb_clear_screen();
-  fb_write_cell(0, 'H', FB_GREEN, FB_DARK_GREY);
-  fb_write_cell(1, 'E', FB_GREEN, FB_DARK_GREY);
-  fb_write_cell(2, 'L', FB_GREEN, FB_DARK_GREY);
-  fb_write_cell(3, 'L', FB_GREEN, FB_DARK_GREY);
-  fb_write_cell(4, 'O', FB_GREEN, FB_DARK_GREY);
+  fb_print("Hello, World!", FB_GREEN, FB_DARK_GREY);
 
   while (1) {}
 }

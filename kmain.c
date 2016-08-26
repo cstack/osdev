@@ -34,6 +34,7 @@ void kmain() {
 
 
   print(welcome_string);
+  move_cursor(17, 0);
 
   // Loop forever
   // TODO: accept user input

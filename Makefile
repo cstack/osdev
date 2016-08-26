@@ -18,6 +18,8 @@ CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 
 ASFLAGS = -f elf
 
+OBJECTS = loader.o drivers/io.o drivers/frame_buffer.o kmain.o
+
 all: os.iso
 
 %.o: %.c
@@ -25,11 +27,11 @@ all: os.iso
 	$(GCC) $(CFLAGS)  $< -o $@
 
 %.o: %.s
-	# assemble s files wiht nasm
+	# assemble s files with nasm
 	$(NASM) $(ASFLAGS) $< -o $@
 
-kernel.elf: loader.o io.o kmain.o
-	$(LD) -T link.ld -melf_i386 loader.o io.o kmain.o -o kernel.elf # Link to make an executable for the kernel.
+kernel.elf: $(OBJECTS)
+	$(LD) -T link.ld -melf_i386 $(OBJECTS) -o kernel.elf # Link to make an executable for the kernel.
 
 os.iso: kernel.elf
 	mkdir -p iso/boot/grub              # create the folder structure

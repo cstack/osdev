@@ -28,8 +28,8 @@ all: os.iso
 	# assemble s files wiht nasm
 	$(NASM) $(ASFLAGS) $< -o $@
 
-kernel.elf: loader.o kmain.o
-	$(LD) -T link.ld -melf_i386 loader.o kmain.o -o kernel.elf # Link to make an executable for the kernel.
+kernel.elf: loader.o io.o kmain.o
+	$(LD) -T link.ld -melf_i386 loader.o io.o kmain.o -o kernel.elf # Link to make an executable for the kernel.
 
 os.iso: kernel.elf
 	mkdir -p iso/boot/grub              # create the folder structure

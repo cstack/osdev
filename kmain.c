@@ -1,10 +1,24 @@
 #include "drivers/frame_buffer.h"
 #include "drivers/serial_port.h"
 
-void kmain() {
-  clear_screen();
+enum output_t {SCREEN, LOG};
 
-  char *welcome_string = ""
+void write(enum output_t output_device, char * s) {
+  switch (output_device) {
+    case (SCREEN):
+      fb_write(s);
+      break;
+    case (LOG):
+      serial_write(SERIAL_COM1_BASE, s);
+      break;
+  }
+}
+
+void printf(char * s) {
+  write(SCREEN, s);
+}
+
+static char *welcome_string = ""
 "                                                                                "
 "                                                                                "
 "                                                                                "
@@ -32,12 +46,13 @@ void kmain() {
 "                                                                                "
 "";
 
+void kmain() {
+  clear_screen();
 
-
-  print(welcome_string);
+  printf(welcome_string);
 
   serial_init(SERIAL_COM1_BASE);
-  serial_print(SERIAL_COM1_BASE, "Hello World!\n");
+  write(LOG, "Initialized serial port.\n");
 
   move_cursor(17, 0);
 

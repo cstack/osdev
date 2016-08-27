@@ -97,7 +97,7 @@ int serial_is_transmit_fifo_empty(unsigned int com)
     return inb(SERIAL_LINE_STATUS_PORT(com)) & 0x20;
 }
 
-void serial_print(unsigned short com, char * s) {
+void serial_write(unsigned short com, char * s) {
     int i = 0;
     while (s[i]) {
         // Block until buffer is not full

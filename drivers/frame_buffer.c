@@ -38,7 +38,7 @@ void clear_screen()
   }
 }
 
-void print(char * s) {
+void fb_write(char * s) {
   int i = 0;
   while (s[i]) {
     fb_write_cell(i, s[i], FB_WHITE, FB_BLACK);

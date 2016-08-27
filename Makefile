@@ -18,7 +18,7 @@ CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 
 ASFLAGS = -f elf
 
-OBJECTS = loader.o drivers/io.o drivers/frame_buffer.o kmain.o
+OBJECTS = loader.o drivers/io.o drivers/frame_buffer.o drivers/serial_port.o kmain.o
 
 all: os.iso
 
@@ -51,11 +51,11 @@ os.iso: kernel.elf
 
 run: os.iso
 	# view contents of register with `p $$eax`
-	$(QEMU) -monitor stdio -cdrom $<
+	$(QEMU) -monitor stdio -cdrom $< -serial file:log/log.txt
 
 clean:
 	rm *.iso
-	rm *.o
+	rm $(OBJECTS)
 	rm *.elf
 	rm *.out
 	rm -rf iso/

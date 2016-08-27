@@ -4,3 +4,4 @@ iso/
 *.o
 *.iso
 stage2_eltorito
+log/

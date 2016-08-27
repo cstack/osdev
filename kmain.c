@@ -1,4 +1,5 @@
 #include "drivers/frame_buffer.h"
+#include "drivers/serial_port.h"
 
 void kmain() {
   clear_screen();
@@ -34,6 +35,10 @@ void kmain() {
 
 
   print(welcome_string);
+
+  serial_init(SERIAL_COM1_BASE);
+  serial_print(SERIAL_COM1_BASE, "Hello World!\n");
+
   move_cursor(17, 0);
 
   // Loop forever

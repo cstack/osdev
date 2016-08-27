@@ -2,3 +2,4 @@
 
 void serial_init(unsigned short com);
 void serial_write(unsigned short com, char * s);
+void serial_write_char(unsigned short com, char c);

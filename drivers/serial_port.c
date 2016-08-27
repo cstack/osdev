@@ -100,10 +100,14 @@ int serial_is_transmit_fifo_empty(unsigned int com)
 void serial_write(unsigned short com, char * s) {
     int i = 0;
     while (s[i]) {
-        // Block until buffer is not full
-        while (!serial_is_transmit_fifo_empty(com)) {}
-
-        outb(SERIAL_DATA_PORT(com), s[i]);
+        serial_write_char(com, s[i]);
         i++;
     }
+}
+
+void serial_write_char(unsigned short com, char c) {
+    // Block until buffer is not full
+    while (!serial_is_transmit_fifo_empty(com)) {}
+
+    outb(SERIAL_DATA_PORT(com), c);
 }

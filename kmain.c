@@ -18,6 +18,10 @@ void printf(char * s) {
   write(SCREEN, s);
 }
 
+void log(char * s) {
+  write(LOG, s);
+}
+
 static char *welcome_string = ""
 "                                                                                "
 "                                                                                "
@@ -52,7 +56,7 @@ void kmain() {
   printf(welcome_string);
 
   serial_init(SERIAL_COM1_BASE);
-  write(LOG, "Initialized serial port.\n");
+  log("Initialized serial port.\n");
 
   move_cursor(17, 0);
 

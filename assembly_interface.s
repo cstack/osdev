@@ -19,3 +19,13 @@ inb:
     mov dx, [esp + 4]       ; move the address of the I/O port to the dx register
     in  al, dx              ; read a byte from the I/O port and store it in the al register
     ret
+
+global lgdt
+
+; lgdt - load global descriptor table
+; stack: [esp + 4] the address of the gdt
+;        [esp    ] return address
+lgdt:
+  mov edx, [esp + 4]
+  lgdt [edx]
+  ret

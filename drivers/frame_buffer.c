@@ -2,7 +2,7 @@
 // http://wiki.osdev.org/Printing_To_Screen
 
 #include "frame_buffer.h"
-#include "io.h"
+#include "../assembly_interface.h"
 
 /* The I/O ports */
 #define FB_COMMAND_PORT         0x3D4

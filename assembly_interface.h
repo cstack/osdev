@@ -1,5 +1,5 @@
-#ifndef INCLUDE_IO_H
-#define INCLUDE_IO_H
+#ifndef INCLUDE_ASSEMBLY_INTERFACE_H
+#define INCLUDE_ASSEMBLY_INTERFACE_H
 
 /** outb:
  *  Sends the given data to the given I/O port. Defined in io.s
@@ -17,4 +17,12 @@ void outb(unsigned short port, unsigned char data);
  */
 unsigned char inb(unsigned short port);
 
-#endif /* INCLUDE_IO_H */
+/** lgdt:
+ *  Loads the global descriptor table
+ *
+ *  @param gdt The address of the gdt
+ */
+void lgdt(void * gdt);
+
+
+#endif /* INCLUDE_ASSEMBLY_INTERFACE_H */

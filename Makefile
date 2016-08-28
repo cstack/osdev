@@ -18,7 +18,7 @@ CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 
 ASFLAGS = -f elf
 
-OBJECTS = loader.o drivers/io.o drivers/frame_buffer.o drivers/serial_port.o kmain.o
+OBJECTS = loader.o drivers/frame_buffer.o drivers/serial_port.o assembly_interface.o kmain.o
 
 all: os.iso
 

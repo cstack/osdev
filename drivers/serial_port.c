@@ -2,6 +2,7 @@
 
 #include "serial_port.h"
 #include "../assembly_interface.h"
+#include "../types.h"
 
 /* The I/O ports */
 
@@ -32,7 +33,7 @@
  *  @param com      The COM port to configure
  *  @param divisor  The divisor
  */
-void serial_configure_baud_rate(unsigned short com, unsigned short divisor)
+void serial_configure_baud_rate(int16 com, int16 divisor)
 {
     outb(SERIAL_LINE_COMMAND_PORT(com),
          SERIAL_LINE_ENABLE_DLAB);
@@ -49,7 +50,7 @@ void serial_configure_baud_rate(unsigned short com, unsigned short divisor)
  *
  *  @param com  The serial port to configure
  */
-void serial_configure_line(unsigned short com)
+void serial_configure_line(int16 com)
 {
     /* Bit:     | 7 | 6 | 5 4 3 | 2 | 1 0 |
      * Content: | d | b | prty  | s | dl  |
@@ -58,7 +59,7 @@ void serial_configure_line(unsigned short com)
     outb(SERIAL_LINE_COMMAND_PORT(com), 0x03);
 }
 
-void serial_configure_fifo(unsigned short com)
+void serial_configure_fifo(int16 com)
 {
     /* Bit:     | 7 6 | 5  | 4 | 3   | 2   | 1   | 0 |
      * Content: | lvl | bs | r | dma | clt | clr | e |
@@ -67,7 +68,7 @@ void serial_configure_fifo(unsigned short com)
     outb(SERIAL_FIFO_COMMAND_PORT(com), 0xC7);
 }
 
-void serial_configure_modem(unsigned short com)
+void serial_configure_modem(int16 com)
 {
     /* Bit:     | 7 | 6 | 5  | 4  | 3   | 2   | 1   | 0   |
      * Content: | r | r | af | lb | ao2 | ao1 | rts | dtr |
@@ -76,7 +77,7 @@ void serial_configure_modem(unsigned short com)
     outb(SERIAL_MODEM_COMMAND_PORT(com), 0x03);
 }
 
-void serial_init(unsigned short com) {
+void serial_init(int16 com) {
     serial_configure_baud_rate(com, 2);
     serial_configure_line(com);
     serial_configure_fifo(com);
@@ -91,13 +92,13 @@ void serial_init(unsigned short com) {
  *  @return 0 if the transmit FIFO queue is not empty
  *          1 if the transmit FIFO queue is empty
  */
-int serial_is_transmit_fifo_empty(unsigned int com)
+int serial_is_transmit_fifo_empty(int16 com)
 {
     /* 0x20 = 0010 0000 */
     return inb(SERIAL_LINE_STATUS_PORT(com)) & 0x20;
 }
 
-void serial_write(unsigned short com, char * s) {
+void serial_write(int16 com, char * s) {
     int i = 0;
     while (s[i]) {
         serial_write_char(com, s[i]);
@@ -105,7 +106,7 @@ void serial_write(unsigned short com, char * s) {
     }
 }
 
-void serial_write_char(unsigned short com, char c) {
+void serial_write_char(int16 com, char c) {
     // Block until buffer is not full
     while (!serial_is_transmit_fifo_empty(com)) {}
 

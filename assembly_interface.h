@@ -20,7 +20,8 @@ unsigned char inb(unsigned short port);
 /** lgdt:
  *  Loads the global descriptor table
  *
- *  @param gdt The address of the gdt
+ *  @param gdt The address of a gdt description structure
+ *  http://wiki.osdev.org/Global_Descriptor_Table#Structure
  */
 void lgdt(void * gdt);
 

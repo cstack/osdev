@@ -23,7 +23,7 @@ inb:
 global lgdt
 
 ; lgdt - load global descriptor table
-; stack: [esp + 4] the address of the gdt
+; stack: [esp + 4] the address of the gdt description structure
 ;        [esp    ] return address
 lgdt:
   mov edx, [esp + 4]

@@ -1,4 +1,9 @@
-#define SERIAL_COM1_BASE                0x3F8      /* COM1 base port */
+#ifndef INCLUSERIAL_PORTFER_H
+#define INCLUSERIAL_PORTFER_H
 
-void serial_init(unsigned short com);
-int serial_write(unsigned short com, const char * s);
+#include "../types.h"
+
+void serial_init();
+void serial_write_byte(uint8_t b);
+
+#endif /* INCLUDE_SERIAL_PORT_H */

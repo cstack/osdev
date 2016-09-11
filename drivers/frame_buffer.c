@@ -15,6 +15,8 @@
 // Start of memory that maps to the frame buffer
 char *fb = (char *) 0x000B8000;
 
+uint16_t cursor_pos = 0;
+
 /** fb_write_cell:
  *  Writes a character with the given foreground and background to position i
  *  in the framebuffer.
@@ -38,15 +40,6 @@ void clear_screen()
   }
 }
 
-int fb_write(const char * s) {
-  int i = 0;
-  while (s[i]) {
-    fb_write_cell(i, s[i], FB_WHITE, FB_BLACK);
-    i++;
-  }
-  return i;
-}
-
 /** move_cursor:
  *  Moves the cursor of the framebuffer to the given position
  *
@@ -60,6 +53,13 @@ void move_cursor_to_pos(unsigned short pos)
   outb(FB_DATA_PORT,    pos & 0x00FF);
 }
 
-void move_cursor(unsigned short row, unsigned short col) {
-  move_cursor_to_pos(row*FB_COLS + col);
+void fb_write_byte(uint8_t b) {
+  fb_write_cell(cursor_pos, b, FB_WHITE, FB_BLACK);
+  cursor_pos++;
+
+  // Stop the cursor from going off the screen
+  // TODO: advance the screen
+  if (cursor_pos < FB_CELLS) {
+    move_cursor_to_pos(cursor_pos);
+  }
 }

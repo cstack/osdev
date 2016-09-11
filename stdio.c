@@ -3,14 +3,22 @@
 #include "drivers/serial_port.h"
 
 int fprintf (FILE stream, const char * format, ...) {
+  void (*write_byte)(uint8_t);
   switch (stream) {
     case (SCREEN):
-      return fb_write(format);
+      write_byte = fb_write_byte;
       break;
     case (LOG):
-      return serial_write(SERIAL_COM1_BASE, format);
+      write_byte = serial_write_byte;
       break;
   }
+
+  int i = 0;
+  while (format[i]) {
+    write_byte(format[i]);
+    i++;
+  }
+  return i;
 }
 
 int printf (const char * format, ...) {
@@ -18,5 +26,5 @@ int printf (const char * format, ...) {
 }
 
 int log(char * format, ...) {
-  return serial_write(SERIAL_COM1_BASE, format);
+  return fprintf(LOG, format);
 }

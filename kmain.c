@@ -130,7 +130,7 @@ void kmain() {
 
   printf(welcome_string);
 
-  serial_init(SERIAL_COM1_BASE);
+  serial_init();
   log("Initialized serial port.\n");
 
   initialize_gdt();
@@ -138,8 +138,6 @@ void kmain() {
 
   initialize_idt();
   log("Loaded interrupt descriptor table.\n");
-
-  move_cursor(17, 0);
 
   interrupt(49);
   log("Returned from interrupt()\n");

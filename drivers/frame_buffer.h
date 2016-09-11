@@ -1,6 +1,8 @@
 #ifndef INCLUDE_FRAME_BUFFER_H
 #define INCLUDE_FRAME_BUFFER_H
 
+#include "../types.h"
+
 #define FB_COLS 80
 #define FB_ROWS 25
 #define FB_CELLS FB_COLS * FB_ROWS
@@ -23,7 +25,6 @@
 #define FB_WHITE 15
 
 void clear_screen();
-int fb_write(const char * s);
-void move_cursor(unsigned short row, unsigned short col);
+void fb_write_byte(uint8_t b);
 
 #endif /* INCLUDE_FRAME_BUFFER_H */

@@ -4,6 +4,8 @@
 #include "../assembly_interface.h"
 #include "../types.h"
 
+#define SERIAL_COM1_BASE                0x3F8      /* COM1 base port */
+
 /* The I/O ports */
 
 /* All the I/O ports are calculated relative to the data port. This is because
@@ -77,11 +79,11 @@ void serial_configure_modem(int16 com)
     outb(SERIAL_MODEM_COMMAND_PORT(com), 0x03);
 }
 
-void serial_init(int16 com) {
-    serial_configure_baud_rate(com, 2);
-    serial_configure_line(com);
-    serial_configure_fifo(com);
-    serial_configure_modem(com);
+void serial_init() {
+    serial_configure_baud_rate(SERIAL_COM1_BASE, 2);
+    serial_configure_line(SERIAL_COM1_BASE);
+    serial_configure_fifo(SERIAL_COM1_BASE);
+    serial_configure_modem(SERIAL_COM1_BASE);
 }
 
 /** serial_is_transmit_fifo_empty:
@@ -98,24 +100,15 @@ int serial_is_transmit_fifo_empty(int16 com)
     return inb(SERIAL_LINE_STATUS_PORT(com)) & 0x20;
 }
 
-int serial_write(int16 com, const char * s) {
-    int i = 0;
-    while (s[i]) {
-        serial_write_byte(com, s[i]);
-        i++;
-    }
-    return i;
-}
-
-void serial_write_byte(int16 com, char c) {
+void serial_write_byte(uint8_t b) {
     // Block until buffer is not full
-    while (!serial_is_transmit_fifo_empty(com)) {}
+    while (!serial_is_transmit_fifo_empty(SERIAL_COM1_BASE)) {}
 
-    outb(SERIAL_DATA_PORT(com), c);
+    outb(SERIAL_DATA_PORT(SERIAL_COM1_BASE), b);
 }
 
-void serial_write_bytes(int16 com, char * c, int n) {
+void serial_write_bytes(char * c, int n) {
     for (int i = 0; i < n; i++) {
-        serial_write_byte(com, c[i]);
+        serial_write_byte(c[i]);
     }
 }

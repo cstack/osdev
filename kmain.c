@@ -142,6 +142,8 @@ void kmain() {
   interrupt(49);
   log("Returned from interrupt()\n");
 
+  enable_keyboard_interrupts();
+
   // Loop forever
   // TODO: accept user input
   while(1) {};

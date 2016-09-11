@@ -1,5 +1,13 @@
 #include "interrupts.h"
+
+#include "assembly_interface.h"
 #include "stdio.h"
+
+void enable_keyboard_interrupts() {
+  outb(0x21,0xfd);
+  outb(0xa1,0xff);
+  enable_hardware_interrupts();
+}
 
 void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t error_code) {
   log("interrupt_handler()\n");

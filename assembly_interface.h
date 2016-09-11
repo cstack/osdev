@@ -41,4 +41,11 @@ void load_idt(void * idt);
  */
 void interrupt(uint32_t interrupt_number);
 
+/** enable_hardware_interrupts:
+ *  Sets the Interrupt bit in the FLAGS
+ *  register, enabling maskable
+ *  hardware interrupts
+ */
+void enable_hardware_interrupts();
+
 #endif /* INCLUDE_ASSEMBLY_INTERFACE_H */

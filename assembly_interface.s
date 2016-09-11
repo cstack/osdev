@@ -47,3 +47,8 @@ global interrupt
 interrupt:
   mov eax, [esp+4]
   int 49
+
+global enable_hardware_interrupts
+; enable_hardware_interrupts
+enable_hardware_interrupts:
+  sti

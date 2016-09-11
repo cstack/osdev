@@ -23,7 +23,7 @@
 #define FB_WHITE 15
 
 void clear_screen();
-void fb_write(char * s);
+int fb_write(const char * s);
 void move_cursor(unsigned short row, unsigned short col);
 
 #endif /* INCLUDE_FRAME_BUFFER_H */

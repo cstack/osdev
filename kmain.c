@@ -2,9 +2,8 @@
 #include "drivers/frame_buffer.h"
 #include "drivers/serial_port.h"
 #include "interrupts.h"
+#include "stdio.h"
 #include "types.h"
-
-enum output_t {SCREEN, LOG};
 
 // a pointer to the global descriptor table
 // passed by reference to the LGDT instruction
@@ -110,10 +109,6 @@ void write(enum output_t output_device, char * s) {
 
 void printf(char * s) {
   write(SCREEN, s);
-}
-
-void log(char * s) {
-  write(LOG, s);
 }
 
 static char *welcome_string = ""

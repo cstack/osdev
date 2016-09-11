@@ -1,3 +1,4 @@
+#include "asm_interrupts.h"
 #include "assembly_interface.h"
 #include "drivers/frame_buffer.h"
 #include "drivers/serial_port.h"
@@ -78,7 +79,7 @@ void initialize_idt() {
   idt_description_structure.size = sizeof(idt) - 1;
   idt_description_structure.offset = (uint32_t) idt;
 
-  uint32_t interrupt_handler_address = (uint32_t) &interrupt_handler;
+  uint32_t interrupt_handler_address = (uint32_t) &interrupt_handler_49;
   uint16_t offset_0_15 = interrupt_handler_address & 0x0000FFFF;
   uint16_t offset_16_31 = interrupt_handler_address >> 16;
   uint16_t selector = KERNAL_CODE_SEGMENT_SELECTOR;
@@ -141,6 +142,7 @@ void kmain() {
   move_cursor(17, 0);
 
   interrupt(49);
+  log("Returned from interrupt()\n");
 
   // Loop forever
   // TODO: accept user input

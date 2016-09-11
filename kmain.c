@@ -96,21 +96,6 @@ void initialize_idt() {
   load_idt(&idt_description_structure);
 }
 
-void write(enum output_t output_device, char * s) {
-  switch (output_device) {
-    case (SCREEN):
-      fb_write(s);
-      break;
-    case (LOG):
-      serial_write(SERIAL_COM1_BASE, s);
-      break;
-  }
-}
-
-void printf(char * s) {
-  write(SCREEN, s);
-}
-
 static char *welcome_string = ""
 "                                                                                "
 "                                                                                "

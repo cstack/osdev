@@ -13,6 +13,10 @@ int fprintf (FILE stream, const char * format, ...) {
   }
 }
 
+int printf (const char * format, ...) {
+  return fprintf(SCREEN, format);
+}
+
 int log(char * format, ...) {
   return serial_write(SERIAL_COM1_BASE, format);
 }

@@ -1,8 +1,17 @@
 #include "interrupts.h"
 #include "stdio.h"
 
-void interrupt_handler(struct cpu_state cpu, struct stack_state stack, uint32_t interrupt) {
+void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t error_code) {
   log("interrupt_handler()\n");
+
+  log("error_code: ");
+  print_uint32(LOG, error_code);
+  log("\n");
+
+  log("interrupt_number: ");
+  print_uint32(LOG, interrupt_number);
+  log("\n");
+
   log("cpu.eax: ");
   print_uint32(LOG, cpu.eax);
   log("\n");
@@ -26,23 +35,6 @@ void interrupt_handler(struct cpu_state cpu, struct stack_state stack, uint32_t 
   log("\n");
   log("cpu.ebp: ");
   print_uint32(LOG, cpu.ebp);
-  log("\n");
-
-  log("stack.error_code: ");
-  print_uint32(LOG, stack.error_code);
-  log("\n");
-  log("stack.eip: ");
-  print_uint32(LOG, stack.eip);
-  log("\n");
-  log("stack.cs: ");
-  print_uint32(LOG, stack.cs);
-  log("\n");
-  log("stack.eflags: ");
-  print_uint32(LOG, stack.eflags);
-  log("\n");
-
-  log("interrupt: ");
-  print_uint32(LOG, interrupt);
   log("\n");
   return;
 }

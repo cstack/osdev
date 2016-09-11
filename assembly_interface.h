@@ -25,5 +25,11 @@ unsigned char inb(unsigned short port);
  */
 void lgdt(void * gdt);
 
+/** load_idt:
+ *  Loads the interrupt descriptor table
+ *
+ *  @param idt The address of the first entry in the IDT
+ */
+void load_idt(void * idt);
 
 #endif /* INCLUDE_ASSEMBLY_INTERFACE_H */

@@ -142,6 +142,10 @@ void kmain() {
   interrupt(49);
   log("Returned from interrupt()\n");
 
+  print_int8(LOG, 0xAB);
+
+  log("\nThe above line should be '0xAB'\n");
+
   // Loop forever
   // TODO: accept user input
   while(1) {};

@@ -101,14 +101,20 @@ int serial_is_transmit_fifo_empty(int16 com)
 void serial_write(int16 com, char * s) {
     int i = 0;
     while (s[i]) {
-        serial_write_char(com, s[i]);
+        serial_write_byte(com, s[i]);
         i++;
     }
 }
 
-void serial_write_char(int16 com, char c) {
+void serial_write_byte(int16 com, char c) {
     // Block until buffer is not full
     while (!serial_is_transmit_fifo_empty(com)) {}
 
     outb(SERIAL_DATA_PORT(com), c);
+}
+
+void serial_write_bytes(int16 com, char * c, int n) {
+    for (int i = 0; i < n; i++) {
+        serial_write_byte(com, c[i]);
+    }
 }

@@ -22,6 +22,7 @@ OBJECTS = loader.o \
 drivers/frame_buffer.o \
 drivers/serial_port.o \
 assembly_interface.o \
+interrupts.o \
 kmain.o
 
 all: os.iso

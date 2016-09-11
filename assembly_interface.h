@@ -1,6 +1,8 @@
 #ifndef INCLUDE_ASSEMBLY_INTERFACE_H
 #define INCLUDE_ASSEMBLY_INTERFACE_H
 
+#include "types.h"
+
 /** outb:
  *  Sends the given data to the given I/O port. Defined in io.s
  *
@@ -25,5 +27,18 @@ unsigned char inb(unsigned short port);
  */
 void lgdt(void * gdt);
 
+/** load_idt:
+ *  Loads the interrupt descriptor table
+ *
+ *  @param idt The address of the first entry in the IDT
+ */
+void load_idt(void * idt);
+
+/** interrupt:
+ *  Generates a software interrupt
+ *
+ *  @param interrupt_number The number of the interrupt of generate
+ */
+void interrupt(uint32_t interrupt_number);
 
 #endif /* INCLUDE_ASSEMBLY_INTERFACE_H */

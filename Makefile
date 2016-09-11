@@ -61,8 +61,8 @@ run: os.iso
 	$(QEMU) -monitor stdio -cdrom $< -serial file:log/log.txt
 
 clean:
-	rm *.iso
-	rm $(OBJECTS)
-	rm *.elf
-	rm *.out
+	rm -f *.iso
+	rm -f $(OBJECTS)
+	rm -f *.elf
+	rm -f *.out
 	rm -rf iso/

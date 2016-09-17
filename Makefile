@@ -22,6 +22,8 @@ OBJECTS = loader.o \
 asm_interrupts.o \
 assembly_interface.o \
 drivers/frame_buffer.o \
+drivers/keyboard.o \
+drivers/pic.o \
 drivers/serial_port.o \
 interrupts.o \
 kmain.o \

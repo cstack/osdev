@@ -77,7 +77,7 @@ void print_half_byte(write_byte_t write_byte, uint8_t half_byte) {
   }
 }
 
-void print_int8(FILE stream, uint8_t data) {
+void print_uint8(FILE stream, uint8_t data) {
   write_byte_t write_byte = write_byte_function(stream);
 
   uint8_t half_byte;

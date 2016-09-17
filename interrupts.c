@@ -1,6 +1,8 @@
 #include "interrupts.h"
 
 #include "assembly_interface.h"
+#include "drivers/keyboard.h"
+#include "drivers/pic.h"
 #include "stdio.h"
 
 void enable_keyboard_interrupts() {
@@ -20,29 +22,18 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
   print_uint32(LOG, interrupt_number);
   log("\n");
 
-  log("cpu.eax: ");
-  print_uint32(LOG, cpu.eax);
-  log("\n");
-  log("cpu.ebx: ");
-  print_uint32(LOG, cpu.ebx);
-  log("\n");
-  log("cpu.ecx: ");
-  print_uint32(LOG, cpu.ecx);
-  log("\n");
-  log("cpu.edx: ");
-  print_uint32(LOG, cpu.edx);
-  log("\n");
-  log("cpu.esi: ");
-  print_uint32(LOG, cpu.esi);
-  log("\n");
-  log("cpu.edi: ");
-  print_uint32(LOG, cpu.edi);
-  log("\n");
-  log("cpu.esp: ");
-  print_uint32(LOG, cpu.esp);
-  log("\n");
-  log("cpu.ebp: ");
-  print_uint32(LOG, cpu.ebp);
-  log("\n");
-  return;
+  if (cpu.eax) {}; // Avoid unused parameter error
+
+  switch(interrupt_number) {
+    case(0x00000009):
+      consume_scan_code();
+      pic_acknowledge(interrupt_number);
+      break;
+
+    default:
+      log("Unhandled Interrupt: ");
+      print_uint32(LOG, interrupt_number);
+      log("\n");
+      break;
+  }
 }

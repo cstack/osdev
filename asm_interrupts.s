@@ -1,5 +1,18 @@
 extern interrupt_handler ; the C interrupt handler
 
+global keyboard_handler
+keyboard_handler:
+  push eax    ;; make sure you don't damage current state
+  in al, 60h   ;; read information from the keyboard
+  mov dx, 3F8h
+  out dx, al ;; write information to the serial line
+
+  mov al, 20h
+  mov dx, 20h
+  out dx, al ;; acknowledge the interrupt to the PIC
+  pop eax     ;; restore state
+  iret        ;; return to code executed before.
+
 global interrupt_handler_0
 interrupt_handler_0:
   push    dword 0

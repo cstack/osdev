@@ -8,6 +8,7 @@
  *
  *  @param num The number of the interrupt
  */
-void pic_acknowledge(uint32_t interrupt);
+void pic_acknowledge();
+void pic_init();
 
 #endif /* INCLUDE_PIC_H */

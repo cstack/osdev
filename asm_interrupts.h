@@ -1,3 +1,4 @@
+void keyboard_handler();
 void interrupt_handler_0();
 void interrupt_handler_1();
 void interrupt_handler_2();

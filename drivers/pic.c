@@ -1,30 +1,23 @@
 #include "pic.h"
 #include "../assembly_interface.h"
+#include "../stdio.h"
 
-#define PIC1_PORT_A 0x20
-#define PIC2_PORT_A 0xA0
+#define PIC1    0x20    /* IO base address for master PIC */
+#define PIC2    0xA0    /* IO base address for slave PIC */
+#define PIC1_COMMAND  PIC1
+#define PIC1_DATA (PIC1+1)
+#define PIC2_COMMAND  PIC2
+#define PIC2_DATA (PIC2+1)
 
-/* The PIC interrupts have been remapped */
-#define PIC1_START_INTERRUPT 0x20
-#define PIC2_START_INTERRUPT 0x28
-#define PIC2_END_INTERRUPT   PIC2_START_INTERRUPT + 7
+#define PIC_EOI   0x20    /* End-of-interrupt command code */
 
-#define PIC_ACK     0x20
+void pic_init() {
+  outb(PIC1_DATA, 0b11111101); // Only enable keyboard (irc 1)
+  outb(PIC2_DATA, 0b11111111); // Don't enable any interrupts on slave pic (irc 8-15)
+  enable_hardware_interrupts();
+}
 
-/** pic_acknowledge:
- *  Acknowledges an interrupt from either PIC 1 or PIC 2.
- *
- *  @param num The number of the interrupt
- */
-void pic_acknowledge(uint32_t interrupt)
+void pic_acknowledge()
 {
-  if (interrupt < PIC1_START_INTERRUPT || interrupt > PIC2_END_INTERRUPT) {
-    return;
-  }
-
-  if (interrupt < PIC2_START_INTERRUPT) {
-    outb(PIC1_PORT_A, PIC_ACK);
-  } else {
-    outb(PIC2_PORT_A, PIC_ACK);
-  }
+  outb(PIC1_COMMAND, PIC_EOI);
 }

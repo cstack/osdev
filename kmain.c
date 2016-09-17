@@ -1,6 +1,7 @@
 #include "asm_interrupts.h"
 #include "assembly_interface.h"
 #include "drivers/frame_buffer.h"
+#include "drivers/pic.h"
 #include "drivers/serial_port.h"
 #include "interrupts.h"
 #include "stdio.h"
@@ -400,11 +401,12 @@ void kmain() {
   log("Loaded interrupt descriptor table.\n");
 
   interrupt(49);
-  log("Returned from interrupt()\n");
+  log("Returned from test interrupt()\n");
 
-  enable_keyboard_interrupts();
+  pic_init();
+  log("Initialized PIC\n");
 
   // Loop forever
-  // TODO: accept user input
-  while(1) {};
+  // User input is accepted asynchronously via interrupts
+  while(1){}
 }

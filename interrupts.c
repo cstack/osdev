@@ -5,11 +5,7 @@
 #include "drivers/pic.h"
 #include "stdio.h"
 
-void enable_keyboard_interrupts() {
-  outb(0x21,0xfd);
-  outb(0xa1,0xff);
-  enable_hardware_interrupts();
-}
+#define INT_KEYBOARD 0x00000009
 
 void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t error_code) {
   log("interrupt_handler()\n");
@@ -25,9 +21,8 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
   if (cpu.eax) {}; // Avoid unused parameter error
 
   switch(interrupt_number) {
-    case(0x00000009):
+    case(INT_KEYBOARD):
       consume_scan_code();
-      pic_acknowledge(interrupt_number);
       break;
 
     default:
@@ -36,4 +31,6 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       log("\n");
       break;
   }
+
+  pic_acknowledge();
 }

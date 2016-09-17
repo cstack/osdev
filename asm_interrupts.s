@@ -58,7 +58,7 @@ global interrupt_handler_9
 interrupt_handler_9:
   push    dword 0
   push    dword 9
-  jmp     common_interrupt_handler
+  jmp common_interrupt_handler
 
 global interrupt_handler_10
 interrupt_handler_10:
@@ -1544,7 +1544,6 @@ common_interrupt_handler:               ; the common parts of the generic interr
   push    edx
   push    esi
   push    edi
-  push    esp
   push    ebp
 
   ; call the C function
@@ -1552,7 +1551,6 @@ common_interrupt_handler:               ; the common parts of the generic interr
 
   ; restore the registers
   pop    ebp
-  pop    esp
   pop    edi
   pop    esi
   pop    edx
@@ -1560,7 +1558,7 @@ common_interrupt_handler:               ; the common parts of the generic interr
   pop    ebx
   pop    eax
 
-  ; restore the esp
+  ; pop error_code and interrupt_number off the stack
   add     esp, 8
 
   ; return to the code that got interrupted

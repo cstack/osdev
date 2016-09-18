@@ -1,4 +1,5 @@
 extern interrupt_handler ; the C interrupt handler
+extern test_interrupt_handler ; the C interrupt handler
 
 global interrupt_handler_0
 interrupt_handler_0:
@@ -56,16 +57,7 @@ interrupt_handler_8:
 
 global interrupt_handler_9
 interrupt_handler_9:
-  push eax    ;; make sure you don't damage current state
-  in al, 60h   ;; read information from the keyboard
-  mov dx, 3F8h
-  out dx, al ;; write information to the serial line
-
-  mov al, 20h
-  mov dx, 20h
-  out dx, al ;; acknowledge the interrupt to the PIC
-  pop eax     ;; restore state
-  iret        ;; return to code executed before.
+  jmp test_common_interrupt_handler
 
 global interrupt_handler_10
 interrupt_handler_10:
@@ -1569,6 +1561,19 @@ common_interrupt_handler:               ; the common parts of the generic interr
 
   ; restore the esp
   add     esp, 8
+
+  ; return to the code that got interrupted
+  iret
+
+test_common_interrupt_handler:               ; the common parts of the generic interrupt handler
+  ; save the registers
+  push    eax
+
+  ; call the C function
+  call    test_interrupt_handler
+
+  ; restore the registers
+  pop    eax
 
   ; return to the code that got interrupted
   iret

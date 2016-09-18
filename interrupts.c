@@ -35,3 +35,9 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       break;
   }
 }
+
+void test_interrupt_handler() {
+  uint8_t scan_code = inb(0x60);
+  outb(0x3F8, scan_code);
+  outb(0x20, 0x20);
+}

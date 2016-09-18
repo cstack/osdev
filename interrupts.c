@@ -49,11 +49,9 @@ void test_interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uin
 
   if (cpu.eax) {}; // Avoid unused parameter error
 
-  uint8_t scan_code;
   switch(interrupt_number) {
     case(0x00000009):
-      scan_code = inb(0x60);
-      outb(0x3F8, scan_code);
+      consume_scan_code();
       break;
 
     default:

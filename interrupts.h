@@ -10,7 +10,6 @@ struct cpu_state {
   uint32_t edx;
   uint32_t esi;
   uint32_t edi;
-  uint32_t esp;
   uint32_t ebp;
 } __attribute__((packed));
 
@@ -23,6 +22,6 @@ struct stack_state {
 
 void enable_keyboard_interrupts();
 void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t error_code);
-void test_interrupt_handler();
+void test_interrupt_handler(struct cpu_state cpu);
 
 #endif /* INCLUDE_INTERRUPTS_H */

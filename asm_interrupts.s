@@ -1568,11 +1568,23 @@ common_interrupt_handler:               ; the common parts of the generic interr
 test_common_interrupt_handler:               ; the common parts of the generic interrupt handler
   ; save the registers
   push    eax
+  push    ebx
+  push    ecx
+  push    edx
+  push    esi
+  push    edi
+  push    ebp
 
   ; call the C function
   call    test_interrupt_handler
 
   ; restore the registers
+  pop    ebp
+  pop    edi
+  pop    esi
+  pop    edx
+  pop    ecx
+  pop    ebx
   pop    eax
 
   ; return to the code that got interrupted

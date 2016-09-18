@@ -3,6 +3,7 @@
 
 #include "frame_buffer.h"
 #include "../assembly_interface.h"
+#include "../stdio.h"
 
 /* The I/O ports */
 #define FB_COMMAND_PORT         0x3D4
@@ -62,4 +63,10 @@ void fb_write_byte(uint8_t b) {
   if (cursor_pos < FB_CELLS) {
     move_cursor_to_pos(cursor_pos);
   }
+}
+
+void fb_backspace() {
+  cursor_pos--;
+  fb_write_cell(cursor_pos, ' ', FB_WHITE, FB_BLACK);
+  move_cursor_to_pos(cursor_pos);
 }

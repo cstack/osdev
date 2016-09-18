@@ -94,6 +94,18 @@ void print_uint8(FILE stream, uint8_t data) {
   }
 }
 
+void print_uint16(FILE stream, uint16_t data) {
+  write_byte_t write_byte = write_byte_function(stream);
+
+  uint8_t half_byte;
+  write_byte('0');
+  write_byte('x');
+  for (int i = 3; i >=0; i--) {
+    half_byte = (data >> (4*i)) & 0x0F;
+    print_half_byte(write_byte, half_byte);
+  }
+}
+
 void print_uint32(FILE stream, uint32_t data) {
   write_byte_t write_byte = write_byte_function(stream);
 

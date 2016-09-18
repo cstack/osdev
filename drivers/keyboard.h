@@ -3,6 +3,7 @@
 
 #include "../types.h"
 
+void keyboard_interrupt_handler();
 uint8_t read_scan_code();
 
 #endif /* INCLUDE_KEYBOARD_H */

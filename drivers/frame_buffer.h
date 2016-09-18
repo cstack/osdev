@@ -25,6 +25,7 @@
 #define FB_WHITE 15
 
 void clear_screen();
+void fb_backspace();
 void fb_write_byte(uint8_t b);
 
 #endif /* INCLUDE_FRAME_BUFFER_H */

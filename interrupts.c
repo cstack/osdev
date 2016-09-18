@@ -61,5 +61,5 @@ void test_interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uin
       break;
   }
 
-  outb(0x20, 0x20);
+  pic_acknowledge();
 }

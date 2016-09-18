@@ -13,6 +13,11 @@ write_byte_t write_byte_function(FILE stream) {
   }
 }
 
+void print_char(FILE stream, char c) {
+  write_byte_t write_byte = write_byte_function(stream);
+  write_byte(c);
+}
+
 int fprintf (FILE stream, const char * format, ...) {
   write_byte_t write_byte = write_byte_function(stream);
 

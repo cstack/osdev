@@ -57,6 +57,8 @@ interrupt_handler_8:
 
 global interrupt_handler_9
 interrupt_handler_9:
+  push    dword 0
+  push    dword 9
   jmp test_common_interrupt_handler
 
 global interrupt_handler_10
@@ -1586,6 +1588,9 @@ test_common_interrupt_handler:               ; the common parts of the generic i
   pop    ecx
   pop    ebx
   pop    eax
+
+  ; restore the esp
+  add     esp, 8
 
   ; return to the code that got interrupted
   iret

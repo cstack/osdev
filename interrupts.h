@@ -22,6 +22,6 @@ struct stack_state {
 
 void enable_keyboard_interrupts();
 void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t error_code);
-void test_interrupt_handler(struct cpu_state cpu);
+void test_interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t error_code);
 
 #endif /* INCLUDE_INTERRUPTS_H */

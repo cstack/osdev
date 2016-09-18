@@ -37,8 +37,6 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
 }
 
 void test_interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t error_code) {
-  if (cpu.eax) {}; // Avoid unused parameter error
-
   log("interrupt_handler()\n");
 
   log("error_code: ");
@@ -49,7 +47,21 @@ void test_interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uin
   print_uint32(LOG, interrupt_number);
   log("\n");
 
-  uint8_t scan_code = inb(0x60);
-  outb(0x3F8, scan_code);
+  if (cpu.eax) {}; // Avoid unused parameter error
+
+  uint8_t scan_code;
+  switch(interrupt_number) {
+    case(0x00000009):
+      scan_code = inb(0x60);
+      outb(0x3F8, scan_code);
+      break;
+
+    default:
+      log("Unhandled Interrupt: ");
+      print_uint32(LOG, interrupt_number);
+      log("\n");
+      break;
+  }
+
   outb(0x20, 0x20);
 }

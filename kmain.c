@@ -86,7 +86,7 @@ uint32_t interrupt_handler_addresses[] = {
   (uint32_t) interrupt_handler_6,
   (uint32_t) interrupt_handler_7,
   (uint32_t) interrupt_handler_8,
-  (uint32_t) keyboard_handler,
+  (uint32_t) interrupt_handler_9,
   (uint32_t) interrupt_handler_10,
   (uint32_t) interrupt_handler_11,
   (uint32_t) interrupt_handler_12,

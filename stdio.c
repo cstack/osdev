@@ -18,6 +18,16 @@ void print_char(FILE stream, char c) {
   write_byte(c);
 }
 
+void print_bytes(FILE stream, uint8_t * bytes, uint32_t num_bytes) {
+  write_byte_t write_byte = write_byte_function(stream);
+  if (num_bytes == 0) { return; }
+  print_uint8(stream, bytes[0]);
+  for (uint32_t i=1; i < num_bytes; i++) {
+    write_byte(' ');
+    print_uint8(stream, bytes[i]);
+  }
+}
+
 int fprintf (FILE stream, const char * format, ...) {
   write_byte_t write_byte = write_byte_function(stream);
 

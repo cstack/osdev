@@ -14,10 +14,15 @@ MAGIC_NUMBER equ 0x1BADB002     ; define the magic number constant
                                 ; whereever 'MAGIC_NUMBER' shows up, in the code,
                                 ; it will be replaced with 0x1BADB002
 
-FLAGS        equ 0x0            ; multiboot flags
+ALIGN_MODULES   equ 0x00000001  ; tell GRUB to align modules on page boundaries.
+                                ; We use modules to load a 'user' program into
+                                ; memory
 
-CHECKSUM     equ -MAGIC_NUMBER  ; calculate the checksum
-                                ; (magic number + checksum + flags should equal 0)
+FLAGS        equ ALIGN_MODULES  ; multiboot flags passed to GRUB
+
+; calculate the checksum
+; (magic number + checksum + flags should equal 0)
+CHECKSUM     equ -(MAGIC_NUMBER + FLAGS)
 
 KERNEL_STACK_SIZE equ 4096      ; size of stack in bytes (1 kilobyte)
 
@@ -40,12 +45,15 @@ loader:                         ; the loader label (defined as entry point in li
                                 ; that means the address of this instruction will
                                 ; appear in the symbol table
 
-    mov eax, 0xCAFEBABE         ; place the number 0xCAFEBABE in the register eax
-
     mov esp, kernel_stack + KERNEL_STACK_SIZE   ; point esp to the start of the
                                                 ; stack (end of memory area)
 
-    jmp kmain
+    push ebx ; GRUB stores a pointer to a struct in the register ebx that,
+             ; among other things, describes at which addresses the modules are loaded.
+             ; Push ebx on the stack before calling kmain to make it an argument for kmain.
+
+    call kmain ; use call rather than jmp so C function finds paramters in the correct place
+    hlt ; should never get here. kmain should not return.
 
 section .bss                        ; Use the 'bss' section for the stack
     align 4                         ; align at 4 bytes for performance reasons

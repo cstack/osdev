@@ -1,6 +1,7 @@
 *.out
 iso/
 *.elf
+*.bin
 *.o
 *.iso
 stage2_eltorito

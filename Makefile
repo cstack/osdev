@@ -27,6 +27,7 @@ drivers/pic.o \
 drivers/serial_port.o \
 interrupts.o \
 kmain.o \
+multiboot_utils.o \
 stdio.o
 
 all: os.iso
@@ -42,11 +43,16 @@ all: os.iso
 kernel.elf: $(OBJECTS)
 	$(LD) -T link.ld -melf_i386 $(OBJECTS) -o kernel.elf # Link to make an executable for the kernel.
 
-os.iso: kernel.elf
+program.bin: program.s
+	$(NASM) -f bin $< -o $@ # `-f bin` creates a flat binary
+
+os.iso: kernel.elf program.bin menu.lst
 	mkdir -p iso/boot/grub              # create the folder structure
+	mkdir -p iso/modules
 	cp stage2_eltorito iso/boot/grub/   # copy the bootloader
 	cp kernel.elf iso/boot/             # copy the kernel
-	cp menu.lst iso/boot/grub           # copy the configuration file
+	cp program.bin iso/modules					# copy the 'user' program
+	cp menu.lst iso/boot/grub           # copy the grub configuration file
 	mkisofs -R                              \
           -b boot/grub/stage2_eltorito    \
           -no-emul-boot                   \
@@ -65,6 +71,7 @@ run: os.iso
 clean:
 	rm -f *.iso
 	rm -f $(OBJECTS)
-	rm -f *.elf
+	rm -f *.elf # elf executables
+	rm -f *.bin # flat binary executables
 	rm -f *.out
 	rm -rf iso/

@@ -4,6 +4,7 @@
 #include "drivers/pic.h"
 #include "drivers/serial_port.h"
 #include "interrupts.h"
+#include "multiboot_utils.h"
 #include "stdio.h"
 #include "types.h"
 
@@ -386,13 +387,22 @@ static char *welcome_string = ""
 "                                                                                "
 "";
 
-void kmain() {
+void kmain(uint32_t ebx) {
+  // GRUB passes info to the kernel through the ebx register
+  multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
+
   clear_screen();
 
   printf(welcome_string);
 
   serial_init();
   log("Initialized serial port.\n");
+
+  print_multiboot_info(LOG, mbinfo);
+
+  void_function_t start_program = first_module_as_a_function(mbinfo);
+  start_program();
+  log("Got past call to start_program()\n");
 
   initialize_gdt();
   log("Loaded global descriptor table.\n");

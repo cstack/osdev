@@ -13,6 +13,8 @@ typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
 typedef unsigned long uint32_t;
 
+typedef void (*void_function_t)(void);
+
 #define bool char
 #define true 1
 #define false 0

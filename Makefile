@@ -5,7 +5,7 @@
 NASM=nasm
 
 # https://en.wikipedia.org/wiki/GNU_linker
-LD=~/.local/binutils/bin/i386-unkown-linux-gnu-ld
+LD=~/.local/binutils/bin/i386-unknown-linux-gnu-ld
 
 # https://en.wikipedia.org/wiki/QEMU
 # Virtual machine

@@ -1,14 +1,13 @@
 #include "multiboot_utils.h"
 
 void print_module_info(FILE stream, struct module * m) {
+  fprintf(stream, (char*) m->string);
+  fprintf(stream, ":\n");
   fprintf(stream, "mod_start: ");
   print_uint32(stream, m->mod_start);
   fprintf(stream, "\n");
   fprintf(stream, "mod_end: ");
   print_uint32(stream, m->mod_end);
-  fprintf(stream, "\n");
-  fprintf(stream, "string: ");
-  fprintf(stream, (char*) m->string);
   fprintf(stream, "\n");
 }
 
@@ -40,12 +39,9 @@ void print_multiboot_info(FILE stream, multiboot_info_t* info) {
 
   struct module * modules;
   if (info->mods_count > 0) {
-    fprintf(stream, "\nmodules:\n");
     modules = (struct module *) info->mods_addr;
     for (uint8_t i = 0; i < info->mods_count; i++) {
-      fprintf(stream, "module #");
-      print_uint8(stream, i);
-      fprintf(stream, ":\n");
+      fprintf(stream, "\n");
       print_module_info(stream, &(modules[i]));
     }
   }

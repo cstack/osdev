@@ -21,6 +21,8 @@ ASFLAGS = -f elf
 OBJECTS = loader.o \
 asm_interrupts.o \
 assembly_interface.o \
+data_structures/global_descriptor_table.o \
+data_structures/interrupt_descriptor_table.o \
 drivers/frame_buffer.o \
 drivers/keyboard.o \
 drivers/pic.o \

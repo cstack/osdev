@@ -86,7 +86,7 @@ interrupt_handler_13:
 
 global interrupt_handler_14
 interrupt_handler_14:
-  push    dword 0
+  ; don't push an error code, the cpu will do that
   push    dword 14
   jmp     common_interrupt_handler
 
@@ -1545,11 +1545,14 @@ common_interrupt_handler:               ; the common parts of the generic interr
   push    esi
   push    edi
   push    ebp
+  mov     eax, cr2
+  push    eax
 
   ; call the C function
   call    interrupt_handler
 
   ; restore the registers
+  add    esp, 4 ; cr2
   pop    ebp
   pop    edi
   pop    esi

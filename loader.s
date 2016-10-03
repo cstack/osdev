@@ -55,7 +55,15 @@ loader:                         ; the loader label (defined as entry point in li
     call kmain ; use call rather than jmp so C function finds paramters in the correct place
     hlt ; should never get here. kmain should not return.
 
+global boot_pagedir
+global boot_pagetab1
 section .bss                        ; Use the 'bss' section for the stack
     align 4                         ; align at 4 bytes for performance reasons
     kernel_stack:                   ; label points to beginning of memory
         resb KERNEL_STACK_SIZE      ; reserve stack for the kernel
+
+    align 4096
+    boot_pagedir:
+        resb 4096
+    boot_pagetab1:
+        resb 4096

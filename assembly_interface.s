@@ -53,3 +53,20 @@ global enable_hardware_interrupts
 enable_hardware_interrupts:
   sti
   ret
+
+global set_page_directory
+; sets cr3 to the physical address of a page directory
+; page_directory: [esp + 4] the physical address of the page directory
+;                 [esp    ] the return address
+set_page_directory:
+  mov eax, [esp+4]
+  mov cr3, eax
+  ret
+
+global enable_paging
+; sets the paging bit on control register 0
+enable_paging:
+  mov eax, cr0
+  or eax, 0x80000000
+  mov cr0, eax
+  ret

@@ -48,4 +48,14 @@ void interrupt(uint32_t interrupt_number);
  */
 void enable_hardware_interrupts();
 
+/** set_page_directory:
+ *  Sets control register 3 to the physical address of a page directory
+ */
+void set_page_directory();
+
+/** enable_paging:
+ *  Sets the paging bit on control register 0
+ */
+void enable_paging();
+
 #endif /* INCLUDE_ASSEMBLY_INTERFACE_H */

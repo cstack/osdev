@@ -1,6 +1,7 @@
 #include "assembly_interface.h"
 #include "data_structures/global_descriptor_table.h"
 #include "data_structures/interrupt_descriptor_table.h"
+#include "data_structures/page_table.h"
 #include "drivers/frame_buffer.h"
 #include "drivers/pic.h"
 #include "drivers/serial_port.h"
@@ -59,6 +60,38 @@ void kmain(uint32_t ebx) {
 
   pic_init();
   log("Initialized PIC\n");
+
+  page_directory_t pd = initialize_page_directory();
+  log("Initialized page directory.\n");
+  log("Address of page directory: ");
+  print_uint32(LOG, (uint32_t) pd);
+  log("\n");
+
+  page_table_t pt = get_page_table(pd, 0);
+  log("Address of first page table: ");
+  print_uint32(LOG, (uint32_t) pt);
+  log("\n");
+
+  log("First 5 page table entries: ");
+  for (int i = 0; i < 5; i++) {
+    print_uint32(LOG, pt[i]);
+    log("\n");
+  }
+
+  log("Setting page directory...\n");
+  set_page_directory(pd);
+  log("Set page directory.\n");
+
+  log("Enabling paging...\n");
+  enable_paging();
+  log("Paging enabled.\n");
+
+  uint32_t * unmapped_address = (uint32_t *) 0x400000; // 4 MB
+  log("Trying to access address ");
+  print_uint32(LOG, (uint32_t) unmapped_address);
+  log(":\n");
+  print_uint8(LOG, *unmapped_address);
+  log("\n. Successfully accessed.");
 
   log("\nMultiboot info passed to kernel from GRUB:\n");
   print_multiboot_info(LOG, mbinfo);

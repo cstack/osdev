@@ -9,59 +9,59 @@
 #include "stdio.h"
 #include "types.h"
 
-// static char *welcome_string = ""
-// "                                                                                "
-// "                                                                                "
-// "                                                                                "
-// "                                                                                "
-// "                              | |                  | |                          "
-// "                   ___   ___  | |_    __ _    ___  | | __                       "
-// "                  / __| / __| | __|  / _` |  / __| | |/ /                       "
-// "                 | (__  \\__ \\ | |_  | (_| | | (__  |   <                        "
-// "                  \\___| |___/  \\__|  \\__,_|  \\___| |_|\\_\\                       "
-// "                                                                                "
-// "                                                                                "
-// "                             ____     _____                                     "
-// "                            / __ \\   / ____|                                    "
-// "                           | |  | | | (___                                      "
-// "                           | |  | |  \\___ \\                                     "
-// "                           | |__| |  ____) |                                    "
-// "                            \\____/  |_____/                                     "
-// "                                                                                "
-// "                                                                                "
-// "                                                                                "
-// "                                                                                "
-// "                                                                                "
-// "                                                                                "
-// "                                                                                "
-// "                                                                                "
-// "";
+static char *welcome_string = ""
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                              | |                  | |                          "
+"                   ___   ___  | |_    __ _    ___  | | __                       "
+"                  / __| / __| | __|  / _` |  / __| | |/ /                       "
+"                 | (__  \\__ \\ | |_  | (_| | | (__  |   <                        "
+"                  \\___| |___/  \\__|  \\__,_|  \\___| |_|\\_\\                       "
+"                                                                                "
+"                                                                                "
+"                             ____     _____                                     "
+"                            / __ \\   / ____|                                    "
+"                           | |  | | | (___                                      "
+"                           | |  | |  \\___ \\                                     "
+"                           | |__| |  ____) |                                    "
+"                            \\____/  |_____/                                     "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"                                                                                "
+"";
 
 void kmain(uint32_t ebx) {
   // // GRUB passes info to the kernel through the ebx register
   // multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
   if(ebx){};
 
-  // clear_screen();
+  clear_screen();
 
-  // printf(welcome_string);
+  printf(welcome_string);
 
   serial_init();
   log("\n--------------------\ncstackOS is booting!\n--------------------\n\nInitialized serial port.\n");
+
+  initialize_gdt();
+  log("Loaded global descriptor table.\n");
+
+  initialize_idt();
+  log("Loaded interrupt descriptor table.\n");
+
+  log("Issuing test interrupt.\n");
+  interrupt(49);
+  log("Returned from test interrupt()\n");
+
+  pic_init();
+  log("Initialized PIC\n");
   while(1){};
-
-  // initialize_gdt();
-  // log("Loaded global descriptor table.\n");
-
-  // initialize_idt();
-  // log("Loaded interrupt descriptor table.\n");
-
-  // log("Issuing test interrupt.\n");
-  // interrupt(49);
-  // log("Returned from test interrupt()\n");
-
-  // pic_init();
-  // log("Initialized PIC\n");
 
   // page_directory_t pd = initialize_page_directory();
   // log("Initialized page directory.\n");

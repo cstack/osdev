@@ -14,7 +14,7 @@
 #define FB_LOW_BYTE_COMMAND     15
 
 // Start of memory that maps to the frame buffer
-char *fb = (char *) 0x000B8000;
+char *fb = (char *) 0xC00B8000;
 
 uint16_t cursor_pos = 0;
 

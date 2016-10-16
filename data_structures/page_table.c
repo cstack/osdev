@@ -55,32 +55,19 @@ uint32_t make_page_table_entry(
 // 1 page directory = 1024 page tables = 4 gB
 
 page_directory_t initialize_page_directory() {
-  page_directory_t pd = (page_directory_t) &boot_pagedir;
-  page_table_t pt = (page_table_t) &boot_pagetab1;
-  *pd = make_page_directory_entry(
-    (uint32_t) pt,
-    FOUR_KB,
-    false,
-    false,
-    SUPERVISOR,
-    READ_WRITE,
-    true
-  );
-  for (int i = 0; i < 1024; i++) {
-    pt[i] = make_page_table_entry(
-      4096*i,
-      false,
-      false,
-      false,
-      SUPERVISOR,
-      READ_WRITE,
-      true
-    );
-  }
+  page_directory_t pd = (page_directory_t) &BootPageDirectory;
   return pd;
 }
 
-page_table_t get_page_table(page_directory_t pd, int i) {
-  uint32_t entry = pd[i];
-  return (page_table_t) (entry & 0xFFFFF000);
+void print_page_directory(FILE stream, page_directory_t pd) {
+  for (int i = 0; i < 1024; i++) {
+    uint32_t entry = pd[i];
+    bool present = entry & 0x1;
+
+    if (present) {
+      fprintf(stream, "page directory entry ");
+      print_uint32(stream, i);
+      fprintf(stream, " is present.\n");
+    }
+  }
 }

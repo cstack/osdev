@@ -36,6 +36,7 @@ KERNEL_PAGE_NUMBER equ (KERNEL_VIRTUAL_BASE >> 22)  ; Page directory index of ke
 
 section .data
 align 0x1000
+global BootPageDirectory
 BootPageDirectory:
     ; This page directory entry identity-maps the first 4MB of the 32-bit physical address space.
     ; All bits are clear except the following:
@@ -104,15 +105,8 @@ StartInHigherHalf:
     call kmain ; use call rather than jmp so C function finds paramters in the correct place
     hlt ; should never get here. kmain should not return.
 
-global boot_pagedir
 global boot_pagetab1
 section .bss                        ; Use the 'bss' section for the stack
     align 4                         ; align at 4 bytes for performance reasons
     kernel_stack:                   ; label points to beginning of memory
         resb KERNEL_STACK_SIZE      ; reserve stack for the kernel
-
-    align 4096
-    boot_pagedir:
-        resb 4096
-    boot_pagetab1:
-        resb 4096

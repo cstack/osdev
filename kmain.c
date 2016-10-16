@@ -48,6 +48,10 @@ void kmain(uint32_t ebx) {
   serial_init();
   log("\n--------------------\ncstackOS is booting!\n--------------------\n\nInitialized serial port.\n");
 
+  log("\nMultiboot info passed to kernel from GRUB:\n");
+  print_multiboot_info(LOG, mbinfo);
+  log("\n");
+
   initialize_gdt();
   log("Loaded global descriptor table.\n");
 
@@ -61,44 +65,24 @@ void kmain(uint32_t ebx) {
   pic_init();
   log("Initialized PIC\n");
 
-  // page_directory_t pd = initialize_page_directory();
-  // log("Initialized page directory.\n");
-  // log("Address of page directory: ");
-  // print_uint32(LOG, (uint32_t) pd);
-  // log("\n");
+  page_directory_t pd = initialize_page_directory();
+  log("Initialized page directory.\n");
+  log("Address of page directory: ");
+  print_uint32(LOG, (uint32_t) pd);
+  log("\n");
 
-  // page_table_t pt = get_page_table(pd, 0);
-  // log("Address of first page table: ");
-  // print_uint32(LOG, (uint32_t) pt);
-  // log("\n");
+  print_page_directory(LOG, pd);
 
-  // log("First 5 page table entries: ");
-  // for (int i = 0; i < 5; i++) {
-  //   print_uint32(LOG, pt[i]);
-  //   log("\n");
-  // }
+  uint32_t * unmapped_address = (uint32_t *) 0x400000; // 4 MB
+  log("Trying to access address ");
+  print_uint32(LOG, (uint32_t) unmapped_address);
+  log(":\n");
+  print_uint8(LOG, *unmapped_address);
+  log("\n. Successfully accessed.");
 
-  // log("Setting page directory...\n");
-  // set_page_directory(pd);
-  // log("Set page directory.\n");
-
-  // log("Enabling paging...\n");
-  // enable_paging();
-  // log("Paging enabled.\n");
-
-  // uint32_t * unmapped_address = (uint32_t *) 0x400000; // 4 MB
-  // log("Trying to access address ");
-  // print_uint32(LOG, (uint32_t) unmapped_address);
-  // log(":\n");
-  // print_uint8(LOG, *unmapped_address);
-  // log("\n. Successfully accessed.");
-
-  log("\nMultiboot info passed to kernel from GRUB:\n");
-  print_multiboot_info(LOG, mbinfo);
-
-  // void_function_t start_program = first_module_as_a_function(mbinfo);
-  // start_program();
-  // log("Got past call to start_program()\n");
+  void_function_t start_program = first_module_as_a_function(mbinfo);
+  start_program();
+  log("Got past call to start_program()\n");
 
   // Loop forever
   // User input is accepted asynchronously via interrupts

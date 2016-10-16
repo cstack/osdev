@@ -30,6 +30,7 @@ KERNEL_STACK_SIZE equ 4096      ; size of stack in bytes (1 kilobyte)
 ; addresses into physical addresses until paging is enabled. Note that this is not
 ; the virtual address where the kernel image itself is loaded -- just the amount that must
 ; be subtracted from a virtual address to get a physical address.
+global KERNEL_VIRTUAL_BASE
 KERNEL_VIRTUAL_BASE equ 0xC0000000                  ; 3GB
 KERNEL_PAGE_NUMBER equ (KERNEL_VIRTUAL_BASE >> 22)  ; Page directory index of kernel's 4MB PTE.
 
@@ -95,6 +96,7 @@ StartInHigherHalf:
     mov esp, kernel_stack + KERNEL_STACK_SIZE   ; point esp to the start of the
                                                 ; stack (end of memory area)
 
+    add ebx, KERNEL_VIRTUAL_BASE ; make the address virtual
     push ebx ; GRUB stores a pointer to a struct in the register ebx that,
              ; among other things, describes at which addresses the modules are loaded.
              ; Push ebx on the stack before calling kmain to make it an argument for kmain.

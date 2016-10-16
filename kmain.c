@@ -38,9 +38,8 @@ static char *welcome_string = ""
 "";
 
 void kmain(uint32_t ebx) {
-  // // GRUB passes info to the kernel through the ebx register
-  // multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
-  if(ebx){};
+  // GRUB passes info to the kernel through the ebx register
+  multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
 
   clear_screen();
 
@@ -61,7 +60,6 @@ void kmain(uint32_t ebx) {
 
   pic_init();
   log("Initialized PIC\n");
-  while(1){};
 
   // page_directory_t pd = initialize_page_directory();
   // log("Initialized page directory.\n");
@@ -95,14 +93,14 @@ void kmain(uint32_t ebx) {
   // print_uint8(LOG, *unmapped_address);
   // log("\n. Successfully accessed.");
 
-  // log("\nMultiboot info passed to kernel from GRUB:\n");
-  // print_multiboot_info(LOG, mbinfo);
+  log("\nMultiboot info passed to kernel from GRUB:\n");
+  print_multiboot_info(LOG, mbinfo);
 
   // void_function_t start_program = first_module_as_a_function(mbinfo);
   // start_program();
   // log("Got past call to start_program()\n");
 
-  // // Loop forever
-  // // User input is accepted asynchronously via interrupts
-  // while(1){}
+  // Loop forever
+  // User input is accepted asynchronously via interrupts
+  while(1){}
 }

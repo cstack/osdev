@@ -37,6 +37,15 @@ static char *welcome_string = ""
 "                                                                                "
 "";
 
+void bad_function() {
+  uint32_t * unmapped_address = (uint32_t *) 0x400000; // 4 MB
+  log("Trying to access address ");
+  print_uint32(LOG, (uint32_t) unmapped_address);
+  log(":\n");
+  print_uint8(LOG, *unmapped_address);
+  log("\n. Successfully accessed.");
+}
+
 void kmain(uint32_t ebx) {
   // GRUB passes info to the kernel through the ebx register
   multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
@@ -73,12 +82,7 @@ void kmain(uint32_t ebx) {
 
   print_page_directory(LOG, pd);
 
-  uint32_t * unmapped_address = (uint32_t *) 0x400000; // 4 MB
-  log("Trying to access address ");
-  print_uint32(LOG, (uint32_t) unmapped_address);
-  log(":\n");
-  print_uint8(LOG, *unmapped_address);
-  log("\n. Successfully accessed.");
+  bad_function();
 
   void_function_t start_program = first_module_as_a_function(mbinfo);
   start_program();

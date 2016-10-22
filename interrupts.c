@@ -16,6 +16,16 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
     log("\n");
   }
 
+  log("Stack trace:\n");
+  uint32_t ebp = cpu.ebp;
+  while (ebp & 0xC0100000) {
+    uint32_t eip = ((uint32_t*) ebp)[1];
+    print_uint32(LOG, eip);
+    log("\n");
+
+    ebp = *((uint32_t*)ebp);
+  }
+
   switch(interrupt_number) {
     case(INT_KEYBOARD):
       keyboard_interrupt_handler();

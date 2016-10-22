@@ -91,8 +91,8 @@ _loader:
 StartInHigherHalf:
     ; Unmap the identity-mapped first 4MB of physical address space. It should not be needed
     ; anymore.
-    mov dword [BootPageDirectory], 0
-    invlpg [0]
+    ; mov dword [BootPageDirectory], 0
+    ; invlpg [0]
 
     mov esp, kernel_stack + KERNEL_STACK_SIZE   ; point esp to the start of the
                                                 ; stack (end of memory area)

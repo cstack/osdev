@@ -24,6 +24,7 @@ assembly_interface.o \
 data_structures/global_descriptor_table.o \
 data_structures/interrupt_descriptor_table.o \
 data_structures/page_table.o \
+data_structures/symbol_table.o \
 drivers/frame_buffer.o \
 drivers/keyboard.o \
 drivers/pic.o \
@@ -31,7 +32,8 @@ drivers/serial_port.o \
 interrupts.o \
 kmain.o \
 multiboot_utils.o \
-stdio.o
+stdio.o \
+string.o
 
 all: os.iso
 

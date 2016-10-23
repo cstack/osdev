@@ -83,12 +83,12 @@ _loader:
  
     ; Start fetching instructions in kernel space.
     ; Since eip at this point holds the physical address of this command (approximately 0x00100000)
-    ; we need to do a long jump to the correct virtual address of StartInHigherHalf which is
+    ; we need to do a long jump to the correct virtual address of higher_half_loader which is
     ; approximately 0xC0100000.
-    lea ecx, [StartInHigherHalf]
+    lea ecx, [higher_half_loader]
     jmp ecx
 
-StartInHigherHalf:
+higher_half_loader:
     ; Unmap the identity-mapped first 4MB of physical address space. It should not be needed
     ; anymore.
     ; mov dword [BootPageDirectory], 0

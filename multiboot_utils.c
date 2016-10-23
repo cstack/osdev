@@ -1,6 +1,7 @@
 #include "multiboot_utils.h"
-#include "loader.h"
 #include "elf.h"
+#include "loader.h"
+#include "string.h"
 
 uint32_t p_to_v(uint32_t physical_address) {
   return physical_address + (uint32_t) &KERNEL_VIRTUAL_BASE;
@@ -16,6 +17,31 @@ void print_module_info(FILE stream, struct module * m) {
   print_uint32(stream, p_to_v(m->mod_end));
   fprintf(stream, "\n");
 }
+
+struct elf_section_header_t * get_elf_section(multiboot_info_t* info, char * section_name) {
+  elf_section_header_table_t section_table = info->u.elf_sec;
+
+  uint32_t addr = p_to_v(section_table.addr);
+  uint32_t num_sections = section_table.num;
+  uint32_t shndx = section_table.shndx;
+
+  struct elf_section_header_t * section_header_table = (struct elf_section_header_t *) addr;
+  uint32_t string_table_start = section_header_table[shndx].sh_addr;
+
+  for (uint32_t i = 0; i < num_sections; i++) {
+    uint32_t sh_name = section_header_table[i].sh_name;
+    if (sh_name != 0) {
+      char * name = (char*) (string_table_start + sh_name);
+      int diff = strcmp(name, section_name);
+      if (diff == 0) {
+        return section_header_table + i;
+      }
+    }
+  }
+
+  return 0;
+}
+
 
 void print_elf_section_header_table(FILE stream, elf_section_header_table_t table) {
   fprintf(stream, "\nELF sections:\n");

@@ -16,4 +16,13 @@ struct elf_section_header_t {
   uint32_t attr9;
 };
 
+typedef struct {
+  uint32_t st_name;
+  uint32_t st_value;
+  uint32_t st_size;
+  uint8_t st_info;
+  uint8_t st_other;
+  uint16_t st_shndx;
+} Elf32_Sym;
+
 #endif /* INCLUDE_ELF_H */

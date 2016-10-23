@@ -2,6 +2,7 @@
 #include "data_structures/global_descriptor_table.h"
 #include "data_structures/interrupt_descriptor_table.h"
 #include "data_structures/page_table.h"
+#include "data_structures/symbol_table.h"
 #include "drivers/frame_buffer.h"
 #include "drivers/pic.h"
 #include "drivers/serial_port.h"
@@ -60,6 +61,12 @@ void kmain(uint32_t ebx) {
   log("\nMultiboot info passed to kernel from GRUB:\n");
   print_multiboot_info(LOG, mbinfo);
   log("\n");
+
+  if (load_symbol_table(get_elf_section(mbinfo, ".symtab"), get_elf_section(mbinfo, ".strtab"))) {
+    log("Initialized symbol table.\n");
+  } else {
+    log("ERROR: Could not initialize symbol table.\n");
+  }
 
   initialize_gdt();
   log("Loaded global descriptor table.\n");

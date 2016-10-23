@@ -7,6 +7,7 @@
 #include "drivers/pic.h"
 #include "drivers/serial_port.h"
 #include "multiboot_utils.h"
+#include "page_allocator.h"
 #include "stdio.h"
 #include "types.h"
 
@@ -47,7 +48,7 @@ void bad_function() {
   log("\n. Successfully accessed.");
 }
 
-void kmain(uint32_t ebx) {
+void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   // GRUB passes info to the kernel through the ebx register
   multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
 
@@ -88,6 +89,11 @@ void kmain(uint32_t ebx) {
   log("\n");
 
   print_page_directory(LOG, pd);
+
+  uint32_t unallocated_bytes = initialize_page_allocator(kernel_memory, mbinfo);
+  log("Initialized page allocator.\n");
+  print_uint32(LOG, unallocated_bytes);
+  log(" bytes unallocated\n");
 
   bad_function();
 

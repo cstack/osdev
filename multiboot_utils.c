@@ -72,16 +72,46 @@ void print_elf_section_header_table(FILE stream, elf_section_header_table_t tabl
   }
 }
 
+void print_memory_map(FILE stream, multiboot_info_t* info) {
+  fprintf(stream, "\nmemory map:\n");
+  memory_map_t * memory_map = (memory_map_t *) info->mmap_addr;
+  uint32_t num_entries = info->mmap_length / sizeof(memory_map_t);
+
+  for (uint32_t i = 0; i < num_entries; i++) {
+    fprintf(stream, "base_addr_low: ");
+    print_uint32(stream, memory_map[i].base_addr_low);
+    fprintf(stream, "\n");
+
+    fprintf(stream, "base_addr_high: ");
+    print_uint32(stream, memory_map[i].base_addr_high);
+    fprintf(stream, "\n");
+
+    fprintf(stream, "length_low: ");
+    print_uint32(stream, memory_map[i].length_low);
+    fprintf(stream, "\n");
+
+    fprintf(stream, "length_high: ");
+    print_uint32(stream, memory_map[i].length_high);
+    fprintf(stream, "\n");
+
+    fprintf(stream, "type: ");
+    print_uint32(stream, memory_map[i].type);
+    fprintf(stream, "\n");
+
+    fprintf(stream, "\n");
+  }
+}
+
 void print_multiboot_info(FILE stream, multiboot_info_t* info) {
   fprintf(stream, "flags: ");
   print_uint32(stream, info->flags);
   fprintf(stream, "\n");
 
-  fprintf(stream, "mem_lower (virtual): ");
-  print_uint32(stream, p_to_v(info->mem_lower));
+  fprintf(stream, "mem_lower (kilobytes): ");
+  print_uint32(stream, info->mem_lower);
   fprintf(stream, "\n");
-  fprintf(stream, "mem_upper (virtual): ");
-  print_uint32(stream, p_to_v(info->mem_upper));
+  fprintf(stream, "mem_upper (kilobytes): ");
+  print_uint32(stream, info->mem_upper);
   fprintf(stream, "\n");
 
   fprintf(stream, "boot_device: ");
@@ -108,6 +138,8 @@ void print_multiboot_info(FILE stream, multiboot_info_t* info) {
   }
 
   print_elf_section_header_table(stream, info->u.elf_sec);
+
+  print_memory_map(stream, info);
 }
 
 void_function_t first_module_as_a_function(multiboot_info_t* info) {

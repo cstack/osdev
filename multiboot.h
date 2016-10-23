@@ -1,3 +1,5 @@
+#ifndef MULTIBOOT_H
+#define MULTIBOOT_H
 // The following was copied from https://www.gnu.org/software/grub/manual/multiboot/html_node/multiboot.h.html
 
 /* multiboot.h - the header for Multiboot */
@@ -119,3 +121,5 @@ typedef struct memory_map
 } memory_map_t;
 
 #endif /* ! ASM */
+
+#endif /* MULTIBOOT_H */

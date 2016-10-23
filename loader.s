@@ -6,6 +6,11 @@ global loader                   ; the entry symbol for ELF
 
 extern kmain                    ; the starting point in our C code
 
+extern kernel_virtual_start
+extern kernel_virtual_end
+extern kernel_physical_start
+extern kernel_physical_end
+
 
 MAGIC_NUMBER equ 0x1BADB002     ; define the magic number constant
                                 ; 'equ' is a pseduo-instruction which does not
@@ -101,6 +106,11 @@ higher_half_loader:
     push ebx ; GRUB stores a pointer to a struct in the register ebx that,
              ; among other things, describes at which addresses the modules are loaded.
              ; Push ebx on the stack before calling kmain to make it an argument for kmain.
+
+    push kernel_physical_end
+    push kernel_physical_start
+    push kernel_virtual_end
+    push kernel_virtual_start
 
     call kmain ; use call rather than jmp so C function finds paramters in the correct place
     hlt ; should never get here. kmain should not return.

@@ -90,10 +90,12 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
 
   print_page_directory(LOG, pd);
 
-  uint32_t unallocated_bytes = initialize_page_allocator(kernel_memory, mbinfo);
+  uint32_t free_pages = initialize_page_allocator(kernel_memory, mbinfo);
   log("Initialized page allocator.\n");
-  print_uint32(LOG, unallocated_bytes);
-  log(" bytes unallocated\n");
+  print_uint32(LOG, free_pages);
+  log(" free pages (");
+  print_uint32(LOG, free_pages / 256);
+  log(" MB)\n");
 
   bad_function();
 

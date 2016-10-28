@@ -11,13 +11,6 @@ struct kernel_memory_descriptor_t {
   uint32_t kernel_physical_end;
 };
 
-struct memory_stats_t
-{
-  uint32_t unallocated_bytes;
-  uint32_t allocated_bytes;
-  uint32_t unavailable_bytes;
-};
-
 bool allocate_page(uint32_t virtual_address);
 uint32_t initialize_page_allocator(struct kernel_memory_descriptor_t kernel_memory, multiboot_info_t* mbinfo);
 

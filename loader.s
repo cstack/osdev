@@ -75,7 +75,9 @@ loader equ (_loader - KERNEL_VIRTUAL_BASE)
 _loader:
     ; NOTE: Until paging is set up, the code must be position-independent and use physical
     ; addresses, not virtual ones!
-    mov ecx, (BootPageDirectory - KERNEL_VIRTUAL_BASE) ; 0x104000
+    global BootPageDirectoryPhysicalAddress
+    BootPageDirectoryPhysicalAddress equ (BootPageDirectory - KERNEL_VIRTUAL_BASE) ; 0x104000
+    mov ecx, BootPageDirectoryPhysicalAddress
     mov cr3, ecx                                        ; Load Page Directory Base Register.
  
     mov ecx, cr4
@@ -96,8 +98,8 @@ _loader:
 higher_half_loader:
     ; Unmap the identity-mapped first 4MB of physical address space. It should not be needed
     ; anymore.
-    ; mov dword [BootPageDirectory], 0
-    ; invlpg [0]
+    mov dword [BootPageDirectory], 0
+    invlpg [0]
 
     mov esp, kernel_stack + KERNEL_STACK_SIZE   ; point esp to the start of the
                                                 ; stack (end of memory area)

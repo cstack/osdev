@@ -1,6 +1,7 @@
 #include "symbol_table.h"
-#include "../multiboot_utils.h"
 
+#include "../loader.h"
+#include "../multiboot_utils.h"
 #include "../stdio.h"
 
 struct symbol_table_descriptor_t {
@@ -19,8 +20,8 @@ bool load_symbol_table(struct elf_section_header_t * symbol_table_section, struc
   } else {
     symbol_table_descriptor.present = true;
     symbol_table_descriptor.num_symbols = symbol_table_section->sh_size / sizeof(Elf32_Sym);
-    symbol_table_descriptor.symbols = (Elf32_Sym *) symbol_table_section->sh_addr;
-    symbol_table_descriptor.string_table_addr = (char*) string_table_section->sh_addr;
+    symbol_table_descriptor.symbols = (Elf32_Sym *) p_to_v(symbol_table_section->sh_addr);
+    symbol_table_descriptor.string_table_addr = (char*) p_to_v(string_table_section->sh_addr);
     return true;
   }
 }

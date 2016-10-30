@@ -7,6 +7,7 @@
 
 void_function_t first_module_as_a_function(multiboot_info_t* info);
 struct elf_section_header_t * get_elf_section(multiboot_info_t* info, char * section_name);
+uint32_t p_to_v(uint32_t physical_address);
 void print_multiboot_info(FILE stream, multiboot_info_t* info);
 
 #endif

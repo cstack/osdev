@@ -7,7 +7,6 @@
 #include "drivers/pic.h"
 #include "drivers/serial_port.h"
 #include "multiboot_utils.h"
-#include "page_allocator.h"
 #include "stdio.h"
 #include "types.h"
 
@@ -82,6 +81,13 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   pic_init();
   log("Initialized PIC\n");
 
+  uint32_t free_pages = initialize_page_allocator(kernel_memory, mbinfo);
+  log("Initialized page allocator.\n");
+  print_uint32(LOG, free_pages);
+  log(" free pages (");
+  print_uint32(LOG, free_pages / 256);
+  log(" MB)\n");
+
   page_directory_t pd = initialize_page_directory();
   log("Initialized page directory.\n");
   log("Address of page directory: ");
@@ -90,18 +96,11 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
 
   print_page_directory(LOG, pd);
 
-  uint32_t free_pages = initialize_page_allocator(kernel_memory, mbinfo);
-  log("Initialized page allocator.\n");
-  print_uint32(LOG, free_pages);
-  log(" free pages (");
-  print_uint32(LOG, free_pages / 256);
-  log(" MB)\n");
+  // bad_function();
 
-  bad_function();
-
-  void_function_t start_program = first_module_as_a_function(mbinfo);
-  start_program();
-  log("Got past call to start_program()\n");
+  // void_function_t start_program = first_module_as_a_function(mbinfo);
+  // start_program();
+  // log("Got past call to start_program()\n");
 
   // Loop forever
   // User input is accepted asynchronously via interrupts

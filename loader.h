@@ -5,8 +5,7 @@
 
 uint32_t KERNEL_VIRTUAL_BASE;
 
-void * BootPageDirectory;
-void * BootPageDirectoryPhysicalAddress;
-void * boot_pagetab1;
+void * PageDirectoryVirtualAddress;
+void * PageDirectoryPhysicalAddress;
 
 #endif /* INCLUDE_LOADER_H */

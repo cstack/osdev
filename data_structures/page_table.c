@@ -3,8 +3,6 @@
 #include "../loader.h"
 #include "../multiboot_utils.h"
 
-uint32_t free_pages;
-
 #define PAGE_DIRECTORY_OFFSET_BITS 10
 #define PAGE_TABLE_OFFSET_BITS 10
 #define PAGE_OFFSET_BITS 12
@@ -12,12 +10,18 @@ uint32_t free_pages;
 #define PAGE_SIZE_BYTES 4096
 #define PAGE_SIZE_DWORDS 1024
 
+#define KERNEL_PAGE_TABLE_NUMBER 768
+
 // #define BITMAP_SIZE 32768
 // Enough room for 512 MB of RAM
 // TODO: Find a more efficient way to initialize page allocator
 #define BITMAP_SIZE 4096
+
+uint32_t free_pages;
 uint32_t free_page_bitmap[BITMAP_SIZE];
 
+void mark_free(uint32_t page_number);
+void mark_unavailable(uint32_t page_number);
 uint32_t page_number(uint32_t address);
 enum page_size_t {FOUR_KB, FOUR_MB};
 enum page_privilege_t {SUPERVISOR, USER};
@@ -32,7 +36,6 @@ uint32_t make_page_directory_entry(
   enum page_permissions_t permissions,
   bool present
 ) {
-  log("make_page_directory_entry()\n");
   uint32_t entry = (uint32_t) page_table_physical_address;
   entry |= page_size << 7;
   entry |= cache_disabled << 4;
@@ -64,55 +67,50 @@ uint32_t make_page_table_entry(
   return entry;
 }
 
-void mark_free(uint32_t page_number);
-void mark_unavailable(uint32_t page_number);
-
 // 1 page = 1024 * 4 bytes = 4 kB
 // 1 page table = 1024 pages = 4 mB
 // 1 page directory = 1024 page tables = 4 gB
 
+// Find a free physical page and return it's physical address
+// This does NOT zero out the page
 void* allocate_physical_page() {
-  // log("allocate_physical_page()\n");
   for (uint32_t index = 0; index < BITMAP_SIZE; index++) {
-    // log("allocate_physical_page() index ");
-    // print_uint32(LOG, index);
-    // log("\n");
     if (free_page_bitmap[index] != 0) {
+      // There is at least one free page in this chunk
       for (uint8_t bit = 0; bit < 32; bit++) {
-        // log("allocate_physical_page() bit ");
-        // print_uint32(LOG, bit);
-        // log("\n");
         if ((free_page_bitmap[index] & (1 << bit)) != 0) {
           uint32_t page_number = index * 32 + bit;
           mark_unavailable(page_number);
-          uint32_t* page_start = (uint32_t*) (page_number << 12);
-          // for (uint32_t i = 0; i < PAGE_SIZE_DWORDS; i++) {
-          //   page_start[i] = 0;
-          // }
-          return  (void*) page_start;
+          void* page_start = (void*) (page_number << PAGE_OFFSET_BITS);
+          return  page_start;
         }
       }
     }
   }
+
+  // Out of physical memory
+  // TODO: Evict a page
   return 0;
 }
 
-void * page_table_virtual_address(uint32_t page_number) {
-  uint32_t virtual_address = page_number << PAGE_OFFSET_BITS;
-  virtual_address |= 0xFFC00000;
+// Assumes we are using recursive page tables.
+// Last entry in page directory points to itself
+void* page_table_virtual_address(uint16_t page_table_number) {
+  // First 10 bits are set to 1
+  uint32_t virtual_address = 0xFFC00000;
+
+  // Next 10 bits index index into page directory
+  virtual_address |= (page_table_number << PAGE_OFFSET_BITS);
+
   return (void*) virtual_address;
 }
 
 page_directory_t initialize_page_directory() {
-  page_directory_t pd = (page_directory_t) &BootPageDirectory;
-  log("pd: ");
-  print_uint32(LOG, (uint32_t) pd);
-  log("\n");
+  page_directory_t pd = (page_directory_t) &PageDirectoryVirtualAddress;
 
   // Make the last entry in the pd a pointer to itself
-  log("Setting last entry in page directory.\n");
   uint32_t pde = make_page_directory_entry(
-    (void*) &BootPageDirectoryPhysicalAddress,
+    (void*) &PageDirectoryPhysicalAddress,
     FOUR_KB,
     false,
     false,
@@ -120,17 +118,11 @@ page_directory_t initialize_page_directory() {
     READ_WRITE,
     true
   );
-  log("pde: ");
-  print_uint32(LOG, pde);
-  log("\n");
   pd[1023] = pde;
 
   // dedicate one page table for memory for the kernel
   void* page_table_physical_address = allocate_physical_page();
-  log("allocated physical memory for page table: ");
-  print_uint32(LOG, (uint32_t) page_table_physical_address);
-  log("\n");
-  pd[768] = make_page_directory_entry(
+  pd[KERNEL_PAGE_TABLE_NUMBER] = make_page_directory_entry(
     page_table_physical_address,
     FOUR_KB,
     false,
@@ -140,19 +132,13 @@ page_directory_t initialize_page_directory() {
     true
   );
 
-  // From here on out, we can access present page tables by setting the
-  // upper bits of the address to 0xFFFFF
-  page_table_t pt = (page_table_t) page_table_virtual_address(768);
-  log("page_table virtual address: ");
-  print_uint32(LOG, (uint32_t) pt);
-  log("\n");
-  for (uint32_t i = 0; i < 1024; i++) {
-    void* page_base = allocate_physical_page();
-    // log("allocated physical memory for a kernel page: ");
-    // print_uint32(LOG, (uint32_t) page_base);
-    // log("\n");
+  // From here on out, we can access page tables with `page_table_virtual_address()`
+  // Fill in the kernel page table entirely.
+  page_table_t pt = (page_table_t) page_table_virtual_address(KERNEL_PAGE_TABLE_NUMBER);
+  for (uint16_t i = 0; i < 1024; i++) {
+    void* page_physical_address = allocate_physical_page();
     pt[i] = make_page_table_entry(
-      page_base,
+      page_physical_address,
       false,
       false,
       false,
@@ -195,7 +181,7 @@ uint32_t round_down_to_nearest_page_start(uint32_t address) {
 }
 
 uint32_t page_number(uint32_t address) {
-  return address >> 12;
+  return address >> PAGE_OFFSET_BITS;
 }
 
 void mark_free(uint32_t page_number) {

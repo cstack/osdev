@@ -26,7 +26,7 @@ struct elf_section_header_t * get_elf_section(multiboot_info_t* info, char * sec
   uint32_t shndx = section_table.shndx;
 
   struct elf_section_header_t * section_header_table = (struct elf_section_header_t *) addr;
-  uint32_t string_table_start = section_header_table[shndx].sh_addr;
+  uint32_t string_table_start = p_to_v(section_header_table[shndx].sh_addr);
 
   for (uint32_t i = 0; i < num_sections; i++) {
     uint32_t sh_name = section_header_table[i].sh_name;
@@ -51,7 +51,7 @@ void print_elf_section_header_table(FILE stream, elf_section_header_table_t tabl
   uint32_t shndx = table.shndx;
 
   struct elf_section_header_t * section_header_table = (struct elf_section_header_t *) addr;
-  uint32_t string_table_start = section_header_table[shndx].sh_addr;
+  uint32_t string_table_start = p_to_v(section_header_table[shndx].sh_addr);
 
   for (uint32_t i = 0; i < num; i++) {
     uint32_t sh_addr = section_header_table[i].sh_addr;
@@ -74,7 +74,7 @@ void print_elf_section_header_table(FILE stream, elf_section_header_table_t tabl
 
 void print_memory_map(FILE stream, multiboot_info_t* info) {
   fprintf(stream, "\nmemory map:\n");
-  memory_map_t * memory_map = (memory_map_t *) info->mmap_addr;
+  memory_map_t * memory_map = (memory_map_t *) p_to_v(info->mmap_addr);
   uint32_t num_entries = info->mmap_length / sizeof(memory_map_t);
 
   for (uint32_t i = 0; i < num_entries; i++) {

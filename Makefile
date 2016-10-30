@@ -32,7 +32,6 @@ drivers/serial_port.o \
 interrupts.o \
 kmain.o \
 multiboot_utils.o \
-page_allocator.o \
 stdio.o \
 string.o
 

@@ -38,7 +38,7 @@ static char *welcome_string = ""
 "                                                                                "
 "";
 
-void bad_function() {
+void trigger_page_fault() {
   uint32_t * unmapped_address = (uint32_t *) 0x400000; // 4 MB
   log("Trying to access address ");
   print_uint32(LOG, (uint32_t) unmapped_address);
@@ -96,7 +96,7 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
 
   print_page_directory(LOG, pd);
 
-  // bad_function();
+  trigger_page_fault();
 
   // void_function_t start_program = first_module_as_a_function(mbinfo);
   // start_program();

@@ -1,6 +1,7 @@
 #include "interrupts.h"
 
 #include "assembly_interface.h"
+#include "data_structures/page_table.h"
 #include "data_structures/symbol_table.h"
 #include "drivers/keyboard.h"
 #include "drivers/pic.h"
@@ -44,8 +45,13 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       keyboard_interrupt_handler();
       break;
     case(INT_PAGE_FAULT):
+      if ((error_code & 0b1) == 0) {
+        // Caused by page-not-present
+        page_in((void*) cpu.cr2);
+        break;
+      }
       log("Interrupt was a page fault. Here's what I know:\n");
-      log("- Tried to access linear address ");
+      log("- Tried to access virtual address ");
       print_uint32(LOG, cpu.cr2);
       log("\n");
       if (error_code & 0b1) {
@@ -69,7 +75,6 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       if (error_code & 0b10000) {
         log("- caused by an instruction fetch.\n");
       }
-      while(1){};
       break;
 
     default:

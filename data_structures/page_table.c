@@ -17,6 +17,9 @@
 // TODO: Find a more efficient way to initialize page allocator
 #define BITMAP_SIZE 4096
 
+// With a recursive page tables, the address of the page directory is constant
+#define PAGE_DIRECTORY_ADDRESS 0xFFFFF000
+
 uint32_t free_pages;
 uint32_t free_page_bitmap[BITMAP_SIZE];
 
@@ -47,6 +50,10 @@ uint32_t make_page_directory_entry(
   return entry;
 }
 
+bool get_present_from_pde(uint32_t pde) {
+  return (pde & 0b1);
+}
+
 uint32_t make_page_table_entry(
   void* page_frame_address,
   bool global,
@@ -65,6 +72,10 @@ uint32_t make_page_table_entry(
   entry |= present;
 
   return entry;
+}
+
+bool get_present_from_pte(uint32_t pte) {
+  return (pte & 0b1);
 }
 
 // 1 page = 1024 * 4 bytes = 4 kB
@@ -241,4 +252,47 @@ uint32_t initialize_page_allocator(struct kernel_memory_descriptor_t kernel_memo
   }
 
   return free_pages;
+}
+
+void page_in(void* virtual_address) {
+  uint32_t page_directory_offset = ((uint32_t) virtual_address) >> PAGE_OFFSET_BITS >> PAGE_TABLE_OFFSET_BITS;
+
+  page_directory_t pd = (page_directory_t) PAGE_DIRECTORY_ADDRESS;
+  uint32_t pde = pd[page_directory_offset];
+
+  if (!get_present_from_pde(pde)) {
+    // Allocate a physical page to hold the page table
+    void* page_table_physical_address = allocate_physical_page();
+
+    pde = make_page_directory_entry(
+      page_table_physical_address,
+      FOUR_KB,
+      false,
+      false,
+      SUPERVISOR,
+      READ_WRITE,
+      true
+    );
+    pd[page_directory_offset] = pde;
+  }
+
+  page_table_t pt = (page_table_t) page_table_virtual_address(page_directory_offset);
+  uint32_t page_table_offset = (((uint32_t) virtual_address) >> PAGE_OFFSET_BITS) & 0x3FF;
+  uint32_t pte = pt[page_table_offset];
+
+  if (!get_present_from_pte(pte)) {
+    // Allocate a physical page to hold the virtual page
+    void* page_physical_address = allocate_physical_page();
+
+    pte = make_page_table_entry(
+      page_physical_address,
+      false,
+      false,
+      false,
+      SUPERVISOR,
+      READ_WRITE,
+      true
+    );
+    pt[page_table_offset] = pte;
+  }
 }

@@ -48,7 +48,7 @@ void initialize_gdt() {
   gdt[KERNAL_DATA_SEGMENT_INDEX].flags_and_limit_16_19 = 0xCF;
   gdt[KERNAL_DATA_SEGMENT_INDEX].base_24_31 = 0x00;
 
-  lgdt(&gdt_description_structure);
+  asm_lgdt(&gdt_description_structure);
 
   // Grub has already loaded the segment registers
   // with the correct values (0x8 for cs, 0x10 for the others)

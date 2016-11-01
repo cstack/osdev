@@ -19,13 +19,13 @@ void outb(unsigned short port, unsigned char data);
  */
 unsigned char inb(unsigned short port);
 
-/** lgdt:
+/** asm_lgdt:
  *  Loads the global descriptor table
  *
  *  @param gdt The address of a gdt description structure
  *  http://wiki.osdev.org/Global_Descriptor_Table#Structure
  */
-void lgdt(void * gdt);
+void asm_lgdt(void * gdt);
 
 /** load_idt:
  *  Loads the interrupt descriptor table

@@ -20,12 +20,12 @@ inb:
     in  al, dx              ; read a byte from the I/O port and store it in the al register
     ret
 
-global lgdt
+global asm_lgdt
 
-; lgdt - load global descriptor table
+; asm_lgdt - load global descriptor table
 ; stack: [esp + 4] the address of the gdt description structure
 ;        [esp    ] return address
-lgdt:
+asm_lgdt:
   mov edx, [esp + 4]
   lgdt [edx]
   ret

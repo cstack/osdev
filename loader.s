@@ -71,8 +71,8 @@ align 4                         ; the code must be 4 byte aligned
     dd FLAGS                    ; the flags,
     dd CHECKSUM                 ; and the checksum
 
-loader equ (_loader - KERNEL_VIRTUAL_BASE)
 _loader:
+loader equ (_loader - KERNEL_VIRTUAL_BASE)
     ; NOTE: Until paging is set up, the code must be position-independent and use physical
     ; addresses, not virtual ones!
     global PageDirectoryPhysicalAddress

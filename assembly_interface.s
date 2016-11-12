@@ -45,8 +45,11 @@ global interrupt
 ; stack: [esp + 4] the software interrupt that should be generated (0-255)
 ;        [esp    ] the return address
 interrupt:
-  mov eax, [esp+4]
+  mov eax, [esp+4] ; TODO: figure out how to pass this parameter to the int instruction
+  push ebp ; make the caller show up in the stack trace
+  mov ebp, esp
   int 49
+  pop ebp
 
 global enable_hardware_interrupts
 ; enable_hardware_interrupts

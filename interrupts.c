@@ -12,6 +12,14 @@
 #define INT_PAGE_FAULT 0x0000000E
 #define INT_SOFTWARE 0x00000031
 
+void log_stack_trace_line(uint32_t eip) {
+  print_uint32(LOG, eip);
+  log(" : ");
+  char * symbol_name = address_to_symbol_name(eip);
+  fprintf(LOG, symbol_name);
+  log("\n");
+}
+
 void log_interrupt_details(char* int_name, uint32_t error_code, uint32_t eip, struct cpu_state* cpu) {
   if(cpu->ebp){}
   log("--------------------\n");
@@ -24,19 +32,12 @@ void log_interrupt_details(char* int_name, uint32_t error_code, uint32_t eip, st
   log("\n");
 
   log("\nStack trace:\n");
-  print_uint32(LOG, eip);
-  log(" : ");
-  char * symbol_name = address_to_symbol_name(eip);
-  fprintf(LOG, symbol_name);
-  log("\n");
+  eip -= 4; // eip actually points one past the instruction that triggered interrupt
+  log_stack_trace_line(eip);
   uint32_t ebp = cpu->ebp;
   while (ebp & 0xC0100000) {
     eip = ((uint32_t*) ebp)[1];
-    print_uint32(LOG, eip);
-    log(" : ");
-    char * symbol_name = address_to_symbol_name(eip);
-    fprintf(LOG, symbol_name);
-    log("\n");
+    log_stack_trace_line(eip);
 
     ebp = *((uint32_t*)ebp);
   }

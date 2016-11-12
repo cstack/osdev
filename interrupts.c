@@ -10,13 +10,15 @@
 #define INT_KEYBOARD 0x00000009
 #define INT_GENERAL_PROTECTION_FAULT 0x0000000D
 #define INT_PAGE_FAULT 0x0000000E
+#define INT_SOFTWARE 0x00000031
 
-void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t error_code, uint32_t eip) {
-  log("\n!!! Interrupt\n");
-  log("interrupt_number: ");
-  print_uint32(LOG, interrupt_number);
+void log_interrupt_details(char* int_name, uint32_t error_code, uint32_t eip, struct cpu_state* cpu) {
+  if(cpu->ebp){}
+  log("--------------------\n");
+
+  log("Interrupt : ");
+  log(int_name);
   log("\n");
-
   log("error_code: ");
   print_uint32(LOG, error_code);
   log("\n");
@@ -27,9 +29,9 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
   char * symbol_name = address_to_symbol_name(eip);
   fprintf(LOG, symbol_name);
   log("\n");
-  uint32_t ebp = cpu.ebp;
+  uint32_t ebp = cpu->ebp;
   while (ebp & 0xC0100000) {
-    uint32_t eip = ((uint32_t*) ebp)[1];
+    eip = ((uint32_t*) ebp)[1];
     print_uint32(LOG, eip);
     log(" : ");
     char * symbol_name = address_to_symbol_name(eip);
@@ -38,8 +40,11 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
 
     ebp = *((uint32_t*)ebp);
   }
-  log("\n");
 
+  log("--------------------\n");
+}
+
+void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t error_code, uint32_t eip) {
   switch(interrupt_number) {
     case(INT_KEYBOARD):
       keyboard_interrupt_handler();
@@ -75,6 +80,10 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       if (error_code & 0b10000) {
         log("- caused by an instruction fetch.\n");
       }
+      break;
+
+    case(INT_SOFTWARE):
+      log_interrupt_details("INT_SOFTWARE", error_code, eip, &cpu);
       break;
 
     default:

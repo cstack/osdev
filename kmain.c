@@ -39,13 +39,9 @@ static char *welcome_string = ""
 "                                                                                "
 "";
 
-void trigger_page_fault() {
-  uint32_t * unmapped_address = (uint32_t *) 0x400000; // 4 MB
-  log("Trying to access address ");
-  print_uint32(LOG, (uint32_t) unmapped_address);
-  log(":\n");
-  print_uint8(LOG, *unmapped_address);
-  log("\n. Successfully accessed.\n");
+uint32_t trigger_page_fault() {
+  uint32_t* unmapped_address = (uint32_t *) 0x400000; // 4 MB
+  return *unmapped_address;
 }
 
 struct test_struct_t {
@@ -63,68 +59,83 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   printf(welcome_string);
 
   serial_init();
-  log("\n--------------------\ncstackOS is booting!\n--------------------\n\nInitialized serial port.\n");
+  log("\n--------------------\ncstackOS is booting!\n--------------------\n\n");
 
+  #ifdef DEBUG
   log("\nMultiboot info passed to kernel from GRUB:\n");
   print_multiboot_info(LOG, mbinfo);
   log("\n");
+  #endif
 
+  log("- Initializing symbol table...\n");
   if (load_symbol_table(get_elf_section(mbinfo, ".symtab"), get_elf_section(mbinfo, ".strtab"))) {
-    log("Initialized symbol table.\n");
+    log("  - done\n");
   } else {
     log("ERROR: Could not initialize symbol table.\n");
+    while(1){}
   }
 
+  log("- Initializing global descriptor table...\n");
   initialize_gdt();
-  log("Loaded global descriptor table.\n");
+  log("  - done\n");
 
+  log("- Initializing interrupt descriptor table...\n");
   initialize_idt();
-  log("Loaded interrupt descriptor table.\n");
+  log("  - done\n");
 
-  log("Issuing test interrupt.\n");
+  log("- Issuing test interrupt...\n");
   interrupt(49);
-  log("Returned from test interrupt()\n");
+  log("  - done\n");
 
+  log("- Initializing programable interrupt controller...\n");
   pic_init();
-  log("Initialized PIC\n");
+  log("  - done\n");
 
+  log("- Initializing page allocator...\n");
   uint32_t free_pages = initialize_page_allocator(kernel_memory, mbinfo);
-  log("Initialized page allocator.\n");
+  log("  - done\n");
+  log("  - ");
   print_uint32(LOG, free_pages);
   log(" free pages (");
   print_uint32(LOG, free_pages / 256);
   log(" MB)\n");
 
+  log("- Initializing page directory...\n");
   page_directory_t pd = initialize_page_directory();
-  log("Initialized page directory.\n");
-  log("Address of page directory: ");
+  log("  - done\n");
+  log("  - Address of page directory: ");
   print_uint32(LOG, (uint32_t) pd);
   log("\n");
+  uint32_t num_pages = num_present_pages(pd);
+  log("  - ");
+  print_uint32(LOG, num_pages);
+  log(" present pages\n");
 
-  print_page_directory(LOG, pd);
-
-  trigger_page_fault();
-
-  struct test_struct_t* test = (struct test_struct_t*) malloc(sizeof(struct test_struct_t));
-
-  log("Dynamically allocated a struct\nAddress is: ");
-  print_uint32(LOG, (uint32_t) test);
+  log("- Triggering a page fault...\n");
+  uint32_t value = trigger_page_fault();
+  log("  - done\n");
+  log("  - value at unmapped address was ");
+  print_uint32(LOG, value);
   log("\n");
 
-  test->character = 'A';
-  test->string = "Hello World";
+  log("- Dynamically allocating a struct...\n");
+  struct test_struct_t* test = (struct test_struct_t*) malloc(sizeof(struct test_struct_t));
+  log("  - done\n");
+  log("  - address is: ");
+  print_uint32(LOG, (uint32_t) test);
+  log("\n");
   
   uint32_t local = 0xDEADBEEF;
 
-  log("local variable at: ");
+  log("  - local variable at: ");
   print_uint32(LOG, (uint32_t) &local);
   log("\n");
-  log("local variable value: ");
+  log("  - local variable value: ");
   print_uint32(LOG, (uint32_t) local);
   log("\n");
 
   void* sp = current_stack_pointer();
-  log("stack pointer is: ");
+  log("  - stack pointer is: ");
   print_uint32(LOG, (uint32_t) sp);
   log("\n");
 

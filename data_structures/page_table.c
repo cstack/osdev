@@ -162,17 +162,17 @@ page_directory_t initialize_page_directory() {
   return pd;
 }
 
-void print_page_directory(FILE stream, page_directory_t pd) {
+uint32_t num_present_pages(page_directory_t pd) {
+  uint32_t num = 0;
   for (int i = 0; i < 1024; i++) {
     uint32_t entry = pd[i];
     bool present = entry & 0x1;
 
     if (present) {
-      fprintf(stream, "page directory entry ");
-      print_uint32(stream, i);
-      fprintf(stream, " is present.\n");
+      num += 1;
     }
   }
+  return num;
 }
 
 uint32_t round_up_to_nearest_page_start(uint32_t address) {

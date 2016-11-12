@@ -58,4 +58,6 @@ void set_page_directory();
  */
 void enable_paging();
 
+void* current_stack_pointer();
+
 #endif /* INCLUDE_ASSEMBLY_INTERFACE_H */

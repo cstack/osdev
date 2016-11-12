@@ -111,18 +111,22 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   print_uint32(LOG, (uint32_t) test);
   log("\n");
 
-  log("test->integer started as: ");
-  print_uint32(LOG, (uint32_t) test->integer);
-  log("\n");
-
-  test->integer = 10;
-
-  log("now test->integer is: ");
-  print_uint32(LOG, (uint32_t) test->integer);
-  log("\n");
-
   test->character = 'A';
   test->string = "Hello World";
+  
+  uint32_t local = 0xDEADBEEF;
+
+  log("local variable at: ");
+  print_uint32(LOG, (uint32_t) &local);
+  log("\n");
+  log("local variable value: ");
+  print_uint32(LOG, (uint32_t) local);
+  log("\n");
+
+  void* sp = current_stack_pointer();
+  log("stack pointer is: ");
+  print_uint32(LOG, (uint32_t) sp);
+  log("\n");
 
   // void_function_t start_program = first_module_as_a_function(mbinfo);
   // start_program();

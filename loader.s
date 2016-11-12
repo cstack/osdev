@@ -101,7 +101,7 @@ higher_half_loader:
     mov dword [PageDirectoryVirtualAddress], 0
     invlpg [0]
 
-    mov esp, kernel_stack + KERNEL_STACK_SIZE   ; point esp to the start of the
+    mov esp, kernel_stack_lowest_address + KERNEL_STACK_SIZE   ; point esp to the start of the
                                                 ; stack (end of memory area)
 
     add ebx, KERNEL_VIRTUAL_BASE ; make the address virtual
@@ -117,7 +117,8 @@ higher_half_loader:
     call kmain ; use call rather than jmp so C function finds paramters in the correct place
     hlt ; should never get here. kmain should not return.
 
+global kernel_stack_lowest_address
 section .bss                        ; Use the 'bss' section for the stack
     align 4                         ; align at 4 bytes for performance reasons
-    kernel_stack:                   ; label points to beginning of memory
+    kernel_stack_lowest_address:    ; label points to beginning of memory
         resb KERNEL_STACK_SIZE      ; reserve stack for the kernel

@@ -33,6 +33,7 @@ interrupts.o \
 kmain.o \
 multiboot_utils.o \
 stdio.o \
+stdlib.o \
 string.o
 
 all: os.iso

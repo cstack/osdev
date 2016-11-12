@@ -8,6 +8,7 @@
 #include "drivers/serial_port.h"
 #include "multiboot_utils.h"
 #include "stdio.h"
+#include "stdlib.h"
 #include "types.h"
 
 static char *welcome_string = ""
@@ -44,8 +45,14 @@ void trigger_page_fault() {
   print_uint32(LOG, (uint32_t) unmapped_address);
   log(":\n");
   print_uint8(LOG, *unmapped_address);
-  log("\n. Successfully accessed.");
+  log("\n. Successfully accessed.\n");
 }
+
+struct test_struct_t {
+  uint32_t integer;
+  char character;
+  char* string;
+};
 
 void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   // GRUB passes info to the kernel through the ebx register
@@ -97,6 +104,25 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   print_page_directory(LOG, pd);
 
   trigger_page_fault();
+
+  struct test_struct_t* test = (struct test_struct_t*) malloc(sizeof(struct test_struct_t));
+
+  log("Dynamically allocated a struct\nAddress is: ");
+  print_uint32(LOG, (uint32_t) test);
+  log("\n");
+
+  log("test->integer started as: ");
+  print_uint32(LOG, (uint32_t) test->integer);
+  log("\n");
+
+  test->integer = 10;
+
+  log("now test->integer is: ");
+  print_uint32(LOG, (uint32_t) test->integer);
+  log("\n");
+
+  test->character = 'A';
+  test->string = "Hello World";
 
   // void_function_t start_program = first_module_as_a_function(mbinfo);
   // start_program();

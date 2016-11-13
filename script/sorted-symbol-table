@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+raw = `greadelf --symbols kernel.elf`
+
+lines = raw.split("\n").drop(3)
+
+formatted_lines = lines.map do |line|
+  line.split(":").drop(1).join("").strip
+end
+
+puts formatted_lines.sort.join("\n")

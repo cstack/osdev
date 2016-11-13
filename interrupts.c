@@ -11,6 +11,7 @@
 #define INT_GENERAL_PROTECTION_FAULT 0x0000000D
 #define INT_PAGE_FAULT 0x0000000E
 #define INT_SOFTWARE 0x00000031
+#define INT_OUT_OF_MEMORY 0x00000032
 
 void log_stack_trace_line(uint32_t eip) {
   print_uint32(LOG, eip);
@@ -87,10 +88,16 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       log_interrupt_details("INT_SOFTWARE", error_code, eip, &cpu);
       break;
 
+    case(INT_OUT_OF_MEMORY):
+      log_interrupt_details("INT_OUT_OF_MEMORY", error_code, eip, &cpu);
+      while(true){}
+      break;
+
     default:
-      log("ERROR: Unabled to handle interrupt: ");
+      log("ERROR: Unable to handle interrupt: ");
       print_uint32(LOG, interrupt_number);
       log("\n");
+      log_interrupt_details("INT_UNKNOWN", error_code, eip, &cpu);
       break;
   }
 

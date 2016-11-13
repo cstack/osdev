@@ -50,6 +50,15 @@ interrupt:
   mov ebp, esp
   int 49
   pop ebp
+  ret
+
+global interrupt_out_of_memory
+interrupt_out_of_memory:
+  push ebp ; make the caller show up in the stack trace
+  mov ebp, esp
+  int 50
+  pop ebp
+  ret
 
 global enable_hardware_interrupts
 ; enable_hardware_interrupts

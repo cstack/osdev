@@ -40,6 +40,7 @@ void load_idt(void * idt);
  *  @param interrupt_number The number of the interrupt of generate
  */
 void interrupt(uint32_t interrupt_number);
+void interrupt_out_of_memory();
 
 /** enable_hardware_interrupts:
  *  Sets the Interrupt bit in the FLAGS

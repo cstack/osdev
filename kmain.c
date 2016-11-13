@@ -139,6 +139,12 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   print_uint32(LOG, (uint32_t) sp);
   log("\n");
 
+  log("- Dynamically allocating 1000 structs...\n");
+  for (uint32_t i = 0; i < 1000; i++) {
+    test = (struct test_struct_t*) malloc(sizeof(struct test_struct_t));
+  }
+  log("  - done\n");
+
   // void_function_t start_program = first_module_as_a_function(mbinfo);
   // start_program();
   // log("Got past call to start_program()\n");

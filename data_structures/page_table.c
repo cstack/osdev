@@ -24,9 +24,6 @@ uint32_t free_page_bitmap[BITMAP_SIZE];
 void mark_free(uint32_t page_number);
 void mark_unavailable(uint32_t page_number);
 uint32_t page_number(uint32_t address);
-enum page_size_t {FOUR_KB, FOUR_MB};
-enum page_privilege_t {SUPERVISOR, USER};
-enum page_permissions_t {READ_ONLY, READ_WRITE};
 
 uint32_t make_page_directory_entry(
   void* page_table_physical_address,

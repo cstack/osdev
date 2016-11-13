@@ -27,9 +27,44 @@ void create_process() {
   log("\n");
 
   log("Allocating a physical page for the new page directory\n");
-  page_in(TMP_PAGE_TABLE_0);
-  log("Paged into TMP_PAGE_TABLE_0\n");
+  page_in(TMP_PAGE_0);
+  page_directory_t pd = TMP_PAGE_0;
+  p->pd = pd;
+  log("Paged into TMP_PAGE_0\n");
   log("Physical address: ");
-  print_uint32(LOG, (uint32_t) virtual_to_physical(TMP_PAGE_TABLE_0));
+  print_uint32(LOG, (uint32_t) virtual_to_physical(pd));
   log("\n");
+
+  log("Allocating a page table for user code\n");
+  page_in(TMP_PAGE_1);
+  page_table_t code_pt = TMP_PAGE_1;
+  uint32_t pde = make_page_directory_entry(
+    virtual_to_physical(code_pt),
+    FOUR_KB,
+    false,
+    false,
+    USER,
+    READ_ONLY,
+    true
+  );
+  pd[0] = pde;
+  log("Allocated physical page ");
+  print_uint32(LOG, (uint32_t) virtual_to_physical(code_pt));
+  log(" and set entry in page directory\n");
+
+  log("Allocating a page for user code\n");
+  page_in(TMP_PAGE_2);
+  uint32_t pte = make_page_table_entry(
+      virtual_to_physical(TMP_PAGE_2),
+      false,
+      false,
+      false,
+      USER,
+      READ_ONLY,
+      true
+    );
+  code_pt[0] = pte;
+  log("Allocated physical page ");
+  print_uint32(LOG, (uint32_t) virtual_to_physical(TMP_PAGE_2));
+  log(" and set entry in code page table\n");
 }

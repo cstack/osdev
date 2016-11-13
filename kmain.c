@@ -84,7 +84,7 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   log("  - done\n");
 
   log("- Issuing test interrupt...\n");
-  interrupt(49);
+  interrupt();
   log("  - done\n");
 
   log("- Initializing programable interrupt controller...\n");

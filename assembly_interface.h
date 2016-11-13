@@ -36,10 +36,8 @@ void load_idt(void * idt);
 
 /** interrupt:
  *  Generates a software interrupt
- *
- *  @param interrupt_number The number of the interrupt of generate
  */
-void interrupt(uint32_t interrupt_number);
+void interrupt();
 void interrupt_out_of_memory();
 
 /** enable_hardware_interrupts:

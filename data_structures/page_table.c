@@ -1,6 +1,7 @@
 #include "page_table.h"
 
 #include "../loader.h"
+#include "../memory.h"
 #include "../multiboot_utils.h"
 
 #define PAGE_DIRECTORY_OFFSET_BITS 10
@@ -16,9 +17,6 @@
 // Enough room for 512 MB of RAM
 // TODO: Find a more efficient way to initialize page allocator
 #define BITMAP_SIZE 4096
-
-// With a recursive page tables, the address of the page directory is constant
-#define PAGE_DIRECTORY_ADDRESS 0xFFFFF000
 
 uint32_t free_pages;
 uint32_t free_page_bitmap[BITMAP_SIZE];
@@ -116,7 +114,7 @@ void* page_table_virtual_address(uint16_t page_table_number) {
   return (void*) virtual_address;
 }
 
-page_directory_t initialize_page_directory() {
+page_directory_t initialize_kernel_page_directory() {
   page_directory_t pd = (page_directory_t) &PageDirectoryVirtualAddress;
 
   // Make the last entry in the pd a pointer to itself
@@ -254,7 +252,7 @@ uint32_t initialize_page_allocator(struct kernel_memory_descriptor_t kernel_memo
   return free_pages;
 }
 
-void page_in(void* virtual_address) {
+void page_in(const void* virtual_address) {
   uint32_t page_directory_offset = ((uint32_t) virtual_address) >> PAGE_OFFSET_BITS >> PAGE_TABLE_OFFSET_BITS;
 
   page_directory_t pd = (page_directory_t) PAGE_DIRECTORY_ADDRESS;
@@ -295,4 +293,18 @@ void page_in(void* virtual_address) {
     );
     pt[page_table_offset] = pte;
   }
+}
+
+void* virtual_to_physical(const void* addr) {
+  uint32_t addr_as_int = (uint32_t) addr;
+  uint32_t page_directory_offset = (addr_as_int & 0xFFC00000) >> 22;
+  uint32_t page_table_offset = (addr_as_int & 0x003FF000) >> 12;
+  uint32_t page_offset = (addr_as_int & 0x00000FFF);
+
+  uint32_t* page_table_addr = (uint32_t*) (FIRST_PAGE_TABLE_ADDRESS + (PAGE_SIZE_BYTES * page_directory_offset));
+  uint32_t page_table_entry = page_table_addr[page_table_offset];
+
+  uint32_t physical_address = ((page_table_entry >> 12) << 12) | page_offset;
+
+  return (void*) physical_address;
 }

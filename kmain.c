@@ -7,6 +7,7 @@
 #include "drivers/pic.h"
 #include "drivers/serial_port.h"
 #include "multiboot_utils.h"
+#include "process.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "types.h"
@@ -101,7 +102,7 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   log(" MB)\n");
 
   log("- Initializing page directory...\n");
-  page_directory_t pd = initialize_page_directory();
+  page_directory_t pd = initialize_kernel_page_directory();
   log("  - done\n");
   log("  - Address of page directory: ");
   print_uint32(LOG, (uint32_t) pd);
@@ -139,10 +140,8 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   print_uint32(LOG, (uint32_t) sp);
   log("\n");
 
-  log("- Dynamically allocating 1000 structs...\n");
-  for (uint32_t i = 0; i < 1000; i++) {
-    test = (struct test_struct_t*) malloc(sizeof(struct test_struct_t));
-  }
+  log("- Creating a user process...\n");
+  create_process();
   log("  - done\n");
 
   // void_function_t start_program = first_module_as_a_function(mbinfo);

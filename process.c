@@ -67,4 +67,40 @@ void create_process() {
   log("Allocated physical page ");
   print_uint32(LOG, (uint32_t) virtual_to_physical(TMP_PAGE_2));
   log(" and set entry in code page table\n");
+
+  log("Allocating a page table for user stack\n");
+  page_in(TMP_PAGE_3);
+  page_table_t stack_pt = TMP_PAGE_3;
+  pde = make_page_directory_entry(
+    virtual_to_physical(stack_pt),
+    FOUR_KB,
+    false,
+    false,
+    USER,
+    READ_ONLY,
+    true
+  );
+  pd[page_directory_offset(UPPER_GB_START) - 1] = pde;
+  log("Allocated physical page ");
+  print_uint32(LOG, (uint32_t) virtual_to_physical(stack_pt));
+  log(" and set entry in page directory\n");
+
+  log("Allocating a page for user stack\n");
+  page_in(TMP_PAGE_4);
+  pte = make_page_table_entry(
+      virtual_to_physical(TMP_PAGE_4),
+      false,
+      false,
+      false,
+      USER,
+      READ_ONLY,
+      true
+    );
+  stack_pt[page_table_offset(UPPER_GB_START) - 1] = pte;
+  log("Allocated physical page ");
+  print_uint32(LOG, (uint32_t) virtual_to_physical(TMP_PAGE_4));
+  log(" and set entry in stack page table\n");
+
+  log("Page directory:\n");
+  print_page_table(LOG, pd);
 }

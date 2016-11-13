@@ -250,10 +250,9 @@ uint32_t initialize_page_allocator(struct kernel_memory_descriptor_t kernel_memo
 }
 
 void page_in(const void* virtual_address) {
-  uint32_t page_directory_offset = ((uint32_t) virtual_address) >> PAGE_OFFSET_BITS >> PAGE_TABLE_OFFSET_BITS;
-
+  uint32_t pd_offset = page_directory_offset(virtual_address);
   page_directory_t pd = (page_directory_t) PAGE_DIRECTORY_ADDRESS;
-  uint32_t pde = pd[page_directory_offset];
+  uint32_t pde = pd[pd_offset];
 
   if (!get_present_from_pde(pde)) {
     // Allocate a physical page to hold the page table
@@ -268,12 +267,12 @@ void page_in(const void* virtual_address) {
       READ_WRITE,
       true
     );
-    pd[page_directory_offset] = pde;
+    pd[pd_offset] = pde;
   }
 
-  page_table_t pt = (page_table_t) page_table_virtual_address(page_directory_offset);
-  uint32_t page_table_offset = (((uint32_t) virtual_address) >> PAGE_OFFSET_BITS) & 0x3FF;
-  uint32_t pte = pt[page_table_offset];
+  page_table_t pt = (page_table_t) page_table_virtual_address(pd_offset);
+  uint32_t pt_offset = page_table_offset(virtual_address);
+  uint32_t pte = pt[pt_offset];
 
   if (!get_present_from_pte(pte)) {
     // Allocate a physical page to hold the virtual page
@@ -288,20 +287,38 @@ void page_in(const void* virtual_address) {
       READ_WRITE,
       true
     );
-    pt[page_table_offset] = pte;
+    pt[pt_offset] = pte;
   }
 }
 
 void* virtual_to_physical(const void* addr) {
-  uint32_t addr_as_int = (uint32_t) addr;
-  uint32_t page_directory_offset = (addr_as_int & 0xFFC00000) >> 22;
-  uint32_t page_table_offset = (addr_as_int & 0x003FF000) >> 12;
-  uint32_t page_offset = (addr_as_int & 0x00000FFF);
+  uint32_t pd_offset = page_directory_offset(addr);
+  uint32_t pt_offset = page_table_offset(addr);
+  uint32_t page_offset = ((uint32_t) addr & 0x00000FFF);
 
-  uint32_t* page_table_addr = (uint32_t*) (FIRST_PAGE_TABLE_ADDRESS + (PAGE_SIZE_BYTES * page_directory_offset));
-  uint32_t page_table_entry = page_table_addr[page_table_offset];
+  uint32_t* page_table_addr = (uint32_t*) (FIRST_PAGE_TABLE_ADDRESS + (PAGE_SIZE_BYTES * pd_offset));
+  uint32_t page_table_entry = page_table_addr[pt_offset];
 
   uint32_t physical_address = ((page_table_entry >> 12) << 12) | page_offset;
 
   return (void*) physical_address;
+}
+
+uint32_t page_directory_offset(const void* virtual_address) {
+  return ((uint32_t) virtual_address) >> PAGE_OFFSET_BITS >> PAGE_TABLE_OFFSET_BITS;
+}
+
+uint32_t page_table_offset(const void* virtual_address) {
+  return (((uint32_t) virtual_address) >> PAGE_OFFSET_BITS) & 0x3FF;
+}
+
+void print_page_table(FILE file, const uint32_t* pt) {
+  fprintf(file, "---\n");
+  for (uint32_t i = 0; i < PAGE_SIZE_DWORDS; i++) {
+    if (get_present_from_pte(pt[i])) {
+      print_uint32(file, i);
+      fprintf(file, " is present\n");
+    }
+  }
+  fprintf(file, "---\n");
 }

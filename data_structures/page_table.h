@@ -43,7 +43,10 @@ uint32_t         make_page_table_entry(
                   bool present
                 );
 uint32_t         num_present_pages(page_directory_t pd);
+uint32_t         page_directory_offset(const void* virtual_address);
 void             page_in(const void* virtual_address);
+uint32_t         page_table_offset(const void* virtual_address);
+void             print_page_table(FILE file, const uint32_t*);
 void*            virtual_to_physical(const void* addr);
 
 #endif /* INCLUDE_PAGE_TABLE_H */

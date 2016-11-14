@@ -141,12 +141,8 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   log("\n");
 
   log("- Creating a user process...\n");
-  create_process();
+  create_process(first_module(mbinfo));
   log("  - done\n");
-
-  // void_function_t start_program = first_module_as_a_function(mbinfo);
-  // start_program();
-  // log("Got past call to start_program()\n");
 
   // Loop forever
   // User input is accepted asynchronously via interrupts

@@ -142,11 +142,11 @@ void print_multiboot_info(FILE stream, multiboot_info_t* info) {
   print_memory_map(stream, info);
 }
 
-void_function_t first_module_as_a_function(multiboot_info_t* info) {
+struct module* first_module(multiboot_info_t* info) {
   if (info->mods_count == 0) {
     return 0;
   }
 
-  struct module * module_info = (struct module *) info->mods_addr;
-  return (void_function_t) module_info->mod_start;
+  struct module* module_info = (struct module*) (p_to_v(info->mods_addr));
+  return module_info;
 }

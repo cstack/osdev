@@ -140,9 +140,10 @@ page_directory_t initialize_kernel_page_directory() {
 
   // From here on out, we can access page tables with `page_table_virtual_address()`
   // Fill in the kernel page table entirely.
+  // Map the kernel's 4MB to the first 4MB of physical memory
   page_table_t pt = (page_table_t) page_table_virtual_address(KERNEL_PAGE_TABLE_NUMBER);
   for (uint16_t i = 0; i < 1024; i++) {
-    void* page_physical_address = allocate_physical_page();
+    void* page_physical_address = (void*) (i * PAGE_SIZE_BYTES);
     pt[i] = make_page_table_entry(
       page_physical_address,
       false,
@@ -230,7 +231,9 @@ uint32_t initialize_page_allocator(struct kernel_memory_descriptor_t kernel_memo
       uint32_t one_past_last_full_page = page_number(round_down_to_nearest_page_start(one_past_last_addr));
 
       for(uint32_t i = first_full_page; i < one_past_last_full_page; i++) {
-        mark_free(i);
+        if (i > PAGE_SIZE_DWORDS) { // First 4MB are where the kernel lives
+          mark_free(i);
+        }
       }
     } else {
       // Unavailable
@@ -291,25 +294,29 @@ void page_in(const void* virtual_address) {
   }
 }
 
-void* virtual_to_physical(const void* addr) {
-  uint32_t pd_offset = page_directory_offset(addr);
-  uint32_t pt_offset = page_table_offset(addr);
-  uint32_t page_offset = ((uint32_t) addr & 0x00000FFF);
-
-  uint32_t* page_table_addr = (uint32_t*) (FIRST_PAGE_TABLE_ADDRESS + (PAGE_SIZE_BYTES * pd_offset));
-  uint32_t page_table_entry = page_table_addr[pt_offset];
-
-  uint32_t physical_address = ((page_table_entry >> 12) << 12) | page_offset;
-
-  return (void*) physical_address;
-}
-
 uint32_t page_directory_offset(const void* virtual_address) {
   return ((uint32_t) virtual_address) >> PAGE_OFFSET_BITS >> PAGE_TABLE_OFFSET_BITS;
 }
 
 uint32_t page_table_offset(const void* virtual_address) {
   return (((uint32_t) virtual_address) >> PAGE_OFFSET_BITS) & 0x3FF;
+}
+
+uint32_t page_offset(const void* addr) {
+  return ((uint32_t) addr & 0x00000FFF);
+}
+
+void* virtual_to_physical(const void* addr) {
+  uint32_t pd_offset = page_directory_offset(addr);
+  uint32_t pt_offset = page_table_offset(addr);
+  uint32_t p_offset = page_offset(addr);
+
+  uint32_t* page_table_addr = (uint32_t*) (FIRST_PAGE_TABLE_ADDRESS + (PAGE_SIZE_BYTES * pd_offset));
+  uint32_t page_table_entry = page_table_addr[pt_offset];
+
+  uint32_t physical_address = ((page_table_entry >> 12) << 12) | p_offset;
+
+  return (void*) physical_address;
 }
 
 void print_page_table(FILE file, const uint32_t* pt) {

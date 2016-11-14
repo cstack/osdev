@@ -12,7 +12,7 @@ struct process_t {
   page_directory_t pd;
 };
 
-void create_process() {
+void create_process(struct module* mod) {
   struct process_t* p = malloc(sizeof(struct process_t));
   p->pid = next_pid;
   next_pid += 1;
@@ -54,8 +54,9 @@ void create_process() {
 
   log("Allocating a page for user code\n");
   page_in(TMP_PAGE_2);
+  void* user_code = TMP_PAGE_2;
   uint32_t pte = make_page_table_entry(
-      virtual_to_physical(TMP_PAGE_2),
+      virtual_to_physical(user_code),
       false,
       false,
       false,
@@ -65,7 +66,7 @@ void create_process() {
     );
   code_pt[0] = pte;
   log("Allocated physical page ");
-  print_uint32(LOG, (uint32_t) virtual_to_physical(TMP_PAGE_2));
+  print_uint32(LOG, (uint32_t) virtual_to_physical(user_code));
   log(" and set entry in code page table\n");
 
   log("Allocating a page table for user stack\n");
@@ -106,4 +107,20 @@ void create_process() {
 
   log("Page directory:\n");
   print_page_table(LOG, pd);
+
+  log("Copying user program into code section:\n");
+  uint32_t program_length_bytes = mod->mod_end - mod->mod_start;
+  void* mod_virtual_start = (void*) (mod->mod_start + UPPER_GB_START);
+
+  log("Copying ");
+  print_uint32(LOG, program_length_bytes);
+  log(" bytes from ");
+  print_uint32(LOG, (uint32_t) mod_virtual_start);
+  log("\n");
+  for (uint32_t i = 0; i < program_length_bytes; i++) {
+    ((uint8_t*)user_code)[i] = ((uint8_t*)mod_virtual_start)[i];
+    print_uint8(LOG, ((uint8_t*)mod_virtual_start)[i]);
+    log("\n");
+  }
+  log("Done copying code.\n");
 }

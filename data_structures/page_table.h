@@ -19,6 +19,7 @@ enum page_permissions_t {READ_ONLY, READ_WRITE};
 enum page_privilege_t {SUPERVISOR, USER};
 enum page_size_t {FOUR_KB, FOUR_MB};
 
+void             map_kernel_into_page_directory(page_directory_t new_pd);
 page_directory_t initialize_kernel_page_directory();
 uint32_t         initialize_page_allocator(
                   struct kernel_memory_descriptor_t kernel_memory,

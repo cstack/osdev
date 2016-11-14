@@ -101,6 +101,9 @@ void create_process() {
   print_uint32(LOG, (uint32_t) virtual_to_physical(TMP_PAGE_4));
   log(" and set entry in stack page table\n");
 
+  log("Mapping in kernel. Copying entries from current page directory.\n");
+  map_kernel_into_page_directory(pd);
+
   log("Page directory:\n");
   print_page_table(LOG, pd);
 }

@@ -322,3 +322,10 @@ void print_page_table(FILE file, const uint32_t* pt) {
   }
   fprintf(file, "---\n");
 }
+
+void map_kernel_into_page_directory(page_directory_t new_pd) {
+  page_directory_t pd = (page_directory_t) PAGE_DIRECTORY_ADDRESS;
+  for (uint32_t i = KERNEL_PAGE_TABLE_NUMBER; i < PAGE_SIZE_DWORDS; i++) {
+    new_pd[i] = pd[i];
+  }
+}

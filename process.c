@@ -94,7 +94,7 @@ void create_process(struct module* mod) {
       false,
       false,
       USER,
-      READ_ONLY,
+      READ_WRITE,
       true
     );
   stack_pt[page_table_offset(UPPER_GB_START) - 1] = pte;

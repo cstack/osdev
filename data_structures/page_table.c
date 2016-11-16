@@ -324,7 +324,9 @@ void print_page_table(FILE file, const uint32_t* pt) {
   for (uint32_t i = 0; i < PAGE_SIZE_DWORDS; i++) {
     if (get_present_from_pte(pt[i])) {
       print_uint32(file, i);
-      fprintf(file, " is present\n");
+      fprintf(file, " -> ");
+      print_uint32(file, pt[i] & (uint32_t) PAGE_DIRECTORY_ADDRESS);
+      fprintf(file, "\n");
     }
   }
   fprintf(file, "---\n");
@@ -332,7 +334,5 @@ void print_page_table(FILE file, const uint32_t* pt) {
 
 void map_kernel_into_page_directory(page_directory_t new_pd) {
   page_directory_t pd = (page_directory_t) PAGE_DIRECTORY_ADDRESS;
-  for (uint32_t i = KERNEL_PAGE_TABLE_NUMBER; i < PAGE_SIZE_DWORDS; i++) {
-    new_pd[i] = pd[i];
-  }
+  new_pd[KERNEL_PAGE_TABLE_NUMBER] = pd[KERNEL_PAGE_TABLE_NUMBER];
 }

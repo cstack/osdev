@@ -1,3 +1,6 @@
+extern USER_DATA_SEGMENT_SELECTOR
+extern USER_CODE_SEGMENT_SELECTOR
+
 global outb             ; make the label outb visible outside this file
 
 ; outb - send a byte to an I/O port
@@ -63,6 +66,12 @@ enable_hardware_interrupts:
   sti
   ret
 
+global disable_hardware_interrupts
+; disable_hardware_interrupts
+disable_hardware_interrupts:
+  cli
+  ret
+
 global set_page_directory
 ; sets cr3 to the physical address of a page directory
 ; page_directory: [esp + 4] the physical address of the page directory
@@ -82,5 +91,20 @@ enable_paging:
 
 global current_stack_pointer
 current_stack_pointer:
-    mov eax, esp
-    ret
+  mov eax, esp
+  ret
+
+global enter_user_mode
+enter_user_mode:
+  mov ax,0x23 ;user data segment with bottom 2 bits set for ring 3
+  mov ds,ax
+  mov es,ax
+  mov fs,ax
+  mov gs,ax ;we don't need to worry about SS. it's handled by iret
+
+  push 0x23 ;user data segment with bottom 2 bits set for ring 3
+  push 0xBFFFFFFB ; the user mode stack pointer
+  pushf ; push current eflags
+  push 0x1B ; user code segment with bottom 2 bits set for ring 3
+  push 0x0 ; the instruction pointer of user mode code to execute
+  iret ; this copies values from the stack into the appropriate registers

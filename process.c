@@ -1,5 +1,6 @@
 #include "process.h"
 
+#include "assembly_interface.h"
 #include "data_structures/page_table.h"
 #include "memory.h"
 #include "stdio.h"
@@ -32,13 +33,26 @@ void create_process(struct module* mod) {
   p->pd = pd;
   log("Paged into TMP_PAGE_0\n");
   log("Physical address: ");
-  print_uint32(LOG, (uint32_t) virtual_to_physical(pd));
+  void* pd_physical_address = virtual_to_physical(pd);
+  print_uint32(LOG, (uint32_t) pd_physical_address);
   log("\n");
+
+  log("Make page table recursive\n");
+  uint32_t pde = make_page_directory_entry(
+    pd_physical_address,
+    FOUR_KB,
+    false,
+    false,
+    SUPERVISOR,
+    READ_WRITE,
+    true
+  );
+  pd[1023] = pde;
 
   log("Allocating a page table for user code\n");
   page_in(TMP_PAGE_1);
   page_table_t code_pt = TMP_PAGE_1;
-  uint32_t pde = make_page_directory_entry(
+  pde = make_page_directory_entry(
     virtual_to_physical(code_pt),
     FOUR_KB,
     false,
@@ -123,4 +137,19 @@ void create_process(struct module* mod) {
     log("\n");
   }
   log("Done copying code.\n");
+
+  log("Disabling hardware interrupts.\n");
+  disable_hardware_interrupts();
+
+  log("Page directory starts as ");
+  print_uint32(LOG, (uint32_t) virtual_to_physical(PAGE_DIRECTORY_ADDRESS));
+  log("\n");
+  log("Setting page directory\n");
+  set_page_directory(virtual_to_physical(pd));
+  log("Page directory physical address is now ");
+  print_uint32(LOG, (uint32_t) virtual_to_physical(PAGE_DIRECTORY_ADDRESS));
+  log("\n");
+
+  log("Entering user mode...\n");
+  enter_user_mode();
 }

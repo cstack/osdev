@@ -47,6 +47,8 @@ void interrupt_out_of_memory();
  */
 void enable_hardware_interrupts();
 
+void disable_hardware_interrupts();
+
 /** set_page_directory:
  *  Sets control register 3 to the physical address of a page directory
  */
@@ -58,5 +60,7 @@ void set_page_directory();
 void enable_paging();
 
 void* current_stack_pointer();
+
+void enter_user_mode();
 
 #endif /* INCLUDE_ASSEMBLY_INTERFACE_H */

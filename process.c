@@ -92,7 +92,7 @@ void create_process(struct module* mod) {
     false,
     false,
     USER,
-    READ_ONLY,
+    READ_WRITE,
     true
   );
   pd[page_directory_offset(UPPER_GB_START) - 1] = pde;
@@ -111,7 +111,7 @@ void create_process(struct module* mod) {
       READ_WRITE,
       true
     );
-  stack_pt[page_table_offset(UPPER_GB_START) - 1] = pte;
+  stack_pt[1023] = pte;
   log("Allocated physical page ");
   print_uint32(LOG, (uint32_t) virtual_to_physical(TMP_PAGE_4));
   log(" and set entry in stack page table\n");

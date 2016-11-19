@@ -41,7 +41,7 @@ all: os.iso
 
 %.o: %.c
 	# Compile c files with gcc
-	$(GCC) $(CFLAGS)  $< -o $@
+	$(GCC) $(CFLAGS) $< -o $@
 
 %.o: %.s
 	# assemble s files with nasm
@@ -50,15 +50,21 @@ all: os.iso
 kernel.elf: $(OBJECTS)
 	$(LD) -T link.ld -melf_i386 $(OBJECTS) -o kernel.elf # Link to make an executable for the kernel.
 
-program.bin: program.s
-	$(NASM) -f bin $< -o $@ # `-f bin` creates a flat binary
+start_user_program.o: start_user_program.s
+	$(NASM) $(ASFLAGS) $< -o $@
 
-os.iso: kernel.elf program.bin menu.lst
+user_program.o: user_program.c
+	$(GCC) $(CFLAGS) $< -o $@
+
+user_program.bin: user_program.o start_user_program.o
+	$(LD) -T link_user_program.ld -melf_i386 $^ -o $@
+
+os.iso: kernel.elf user_program.bin menu.lst
 	mkdir -p iso/boot/grub              # create the folder structure
 	mkdir -p iso/modules
 	cp stage2_eltorito iso/boot/grub/   # copy the bootloader
 	cp kernel.elf iso/boot/             # copy the kernel
-	cp program.bin iso/modules					# copy the 'user' program
+	cp user_program.bin iso/modules			# copy the 'user' program
 	cp menu.lst iso/boot/grub           # copy the grub configuration file
 	mkisofs -R                              \
           -b boot/grub/stage2_eltorito    \

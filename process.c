@@ -150,6 +150,12 @@ void create_process(struct module* mod) {
   print_uint32(LOG, (uint32_t) virtual_to_physical(PAGE_DIRECTORY_ADDRESS));
   log("\n");
 
+  uint32_t* stack_highest_address = (uint32_t*) 0xbffffffb;
+  uint32_t value_on_stack = *stack_highest_address;
+  log("Value on stack: ");
+  print_uint32(LOG, value_on_stack);
+  log("\n");
+
   log("Entering user mode...\n");
   enter_user_mode();
 }

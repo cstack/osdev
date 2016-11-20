@@ -119,6 +119,10 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   print_uint32(LOG, value);
   log("\n");
 
+  log("- Initializing task state segment...\n");
+  initialize_tss();
+  log("  - done\n");
+
   log("- Dynamically allocating a struct...\n");
   struct test_struct_t* test = (struct test_struct_t*) malloc(sizeof(struct test_struct_t));
   log("  - done\n");

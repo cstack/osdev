@@ -3,6 +3,13 @@
 
 #include "types.h"
 
+#define INT_KEYBOARD 0x00000009
+#define INT_GENERAL_PROTECTION_FAULT 0x0000000D
+#define INT_PAGE_FAULT 0x0000000E
+#define INT_SOFTWARE 0x00000031
+#define INT_OUT_OF_MEMORY 0x00000032
+#define INT_SYSCALL 0x00000080
+
 struct cpu_state {
   uint32_t cr2;
   uint32_t ebp;

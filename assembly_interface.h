@@ -27,6 +27,8 @@ unsigned char inb(unsigned short port);
  */
 void asm_lgdt(void * gdt);
 
+void tss_flush();
+
 /** load_idt:
  *  Loads the interrupt descriptor table
  *

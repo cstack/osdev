@@ -103,7 +103,6 @@ higher_half_loader:
 
     mov esp, kernel_stack_lowest_address + KERNEL_STACK_SIZE   ; point esp to the start of the
                                                 ; stack (end of memory area)
-
     add ebx, KERNEL_VIRTUAL_BASE ; make the address virtual
     push ebx ; GRUB stores a pointer to a struct in the register ebx that,
              ; among other things, describes at which addresses the modules are loaded.

@@ -10,4 +10,6 @@
 #define FIRST_PAGE_TABLE_ADDRESS (void*) 0xFFC00000 // 4 MB from end
 #define PAGE_DIRECTORY_ADDRESS   (void*) 0xFFFFF000 // 4 KB from end
 
+#define KERNEL_STACK_SIZE 4096
+
 #endif /* INCLUDE_MEMORY_H */

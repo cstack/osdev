@@ -5,13 +5,9 @@
 #include "data_structures/symbol_table.h"
 #include "drivers/keyboard.h"
 #include "drivers/pic.h"
+#include "loader.h"
+#include "memory.h"
 #include "stdio.h"
-
-#define INT_KEYBOARD 0x00000009
-#define INT_GENERAL_PROTECTION_FAULT 0x0000000D
-#define INT_PAGE_FAULT 0x0000000E
-#define INT_SOFTWARE 0x00000031
-#define INT_OUT_OF_MEMORY 0x00000032
 
 void log_stack_trace_line(uint32_t eip) {
   print_uint32(LOG, eip);
@@ -36,7 +32,8 @@ void log_interrupt_details(char* int_name, uint32_t error_code, uint32_t eip, st
   eip -= 4; // eip actually points one past the instruction that triggered interrupt
   log_stack_trace_line(eip);
   uint32_t ebp = cpu->ebp;
-  while (ebp & 0xC0100000) {
+  uint32_t kernel_stack_highest_address = ((uint32_t) &kernel_stack_lowest_address + KERNEL_STACK_SIZE - 4);
+  while (ebp <= kernel_stack_highest_address && ebp >= ((uint32_t) &kernel_stack_lowest_address)) {
     eip = ((uint32_t*) ebp)[1];
     log_stack_trace_line(eip);
 
@@ -52,6 +49,7 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       keyboard_interrupt_handler();
       break;
     case(INT_PAGE_FAULT):
+      log_interrupt_details("INT_PAGE_FAULT", error_code, eip, &cpu);
       if ((error_code & 0b1) == 0) {
         // Caused by page-not-present
         page_in((void*) cpu.cr2);
@@ -88,6 +86,10 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       log_interrupt_details("INT_SOFTWARE", error_code, eip, &cpu);
       break;
 
+    case(INT_SYSCALL):
+      log_interrupt_details("INT_SYSCALL", error_code, eip, &cpu);
+      break;
+
     case(INT_OUT_OF_MEMORY):
       log_interrupt_details("INT_OUT_OF_MEMORY", error_code, eip, &cpu);
       while(true){}
@@ -98,6 +100,7 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       print_uint32(LOG, interrupt_number);
       log("\n");
       log_interrupt_details("INT_UNKNOWN", error_code, eip, &cpu);
+      while(1){}
       break;
   }
 

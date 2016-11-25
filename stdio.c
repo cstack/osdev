@@ -28,12 +28,31 @@ void print_bytes(FILE stream, uint8_t * bytes, uint32_t num_bytes) {
   }
 }
 
+enum format_string_mode {NORMAL, COMMAND};
 int fprintf (FILE stream, const char * format, ...) {
   write_byte_t write_byte = write_byte_function(stream);
 
   int i = 0;
+  enum format_string_mode mode = NORMAL;
   while (format[i]) {
-    write_byte(format[i]);
+    switch (mode) {
+      case (NORMAL):
+        if (format[i] == '%') {
+          mode = COMMAND;
+        } else {
+          write_byte(format[i]);
+        }
+        break;
+      case (COMMAND):
+        if (format[i] == '%') {
+          write_byte('%');
+          mode = NORMAL;
+        } else {
+          write_byte('?');
+          mode = NORMAL;
+        }
+        break;
+    }
     i++;
   }
   return i;

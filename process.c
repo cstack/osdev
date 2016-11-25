@@ -18,26 +18,11 @@ void create_process(struct module* mod) {
   p->pid = next_pid;
   next_pid += 1;
 
-  log("Created process descriptor:\n");
-  log("Virtual address: ");
-  print_uint32(LOG, (uint32_t) p);
-  log("\n");
-
-  log("pid: ");
-  print_uint32(LOG, (uint32_t) p->pid);
-  log("\n");
-
-  log("Allocating a physical page for the new page directory\n");
   page_in(TMP_PAGE_0);
   page_directory_t pd = TMP_PAGE_0;
   p->pd = pd;
-  log("Paged into TMP_PAGE_0\n");
-  log("Physical address: ");
   void* pd_physical_address = virtual_to_physical(pd);
-  print_uint32(LOG, (uint32_t) pd_physical_address);
-  log("\n");
 
-  log("Make page table recursive\n");
   uint32_t pde = make_page_directory_entry(
     pd_physical_address,
     FOUR_KB,
@@ -49,7 +34,6 @@ void create_process(struct module* mod) {
   );
   pd[1023] = pde;
 
-  log("Allocating a page table for user code\n");
   page_in(TMP_PAGE_1);
   page_table_t code_pt = TMP_PAGE_1;
   pde = make_page_directory_entry(
@@ -62,11 +46,7 @@ void create_process(struct module* mod) {
     true
   );
   pd[0] = pde;
-  log("Allocated physical page ");
-  print_uint32(LOG, (uint32_t) virtual_to_physical(code_pt));
-  log(" and set entry in page directory\n");
 
-  log("Allocating a page for user code\n");
   page_in(TMP_PAGE_2);
   void* user_code = TMP_PAGE_2;
   uint32_t pte = make_page_table_entry(
@@ -79,11 +59,7 @@ void create_process(struct module* mod) {
       true
     );
   code_pt[0] = pte;
-  log("Allocated physical page ");
-  print_uint32(LOG, (uint32_t) virtual_to_physical(user_code));
-  log(" and set entry in code page table\n");
 
-  log("Allocating a page table for user stack\n");
   page_in(TMP_PAGE_3);
   page_table_t stack_pt = TMP_PAGE_3;
   pde = make_page_directory_entry(
@@ -96,11 +72,7 @@ void create_process(struct module* mod) {
     true
   );
   pd[page_directory_offset(UPPER_GB_START) - 1] = pde;
-  log("Allocated physical page ");
-  print_uint32(LOG, (uint32_t) virtual_to_physical(stack_pt));
-  log(" and set entry in page directory\n");
 
-  log("Allocating a page for user stack\n");
   page_in(TMP_PAGE_4);
   pte = make_page_table_entry(
       virtual_to_physical(TMP_PAGE_4),
@@ -112,47 +84,19 @@ void create_process(struct module* mod) {
       true
     );
   stack_pt[1023] = pte;
-  log("Allocated physical page ");
-  print_uint32(LOG, (uint32_t) virtual_to_physical(TMP_PAGE_4));
-  log(" and set entry in stack page table\n");
 
-  log("Mapping in kernel. Copying entries from current page directory.\n");
   map_kernel_into_page_directory(pd);
 
-  log("Page directory:\n");
-  print_page_table(LOG, pd);
-
-  log("Copying user program into code section:\n");
   uint32_t program_length_bytes = mod->mod_end - mod->mod_start;
   void* mod_virtual_start = (void*) (mod->mod_start + UPPER_GB_START);
 
-  log("Copying ");
-  print_uint32(LOG, program_length_bytes);
-  log(" bytes from ");
-  print_uint32(LOG, (uint32_t) mod_virtual_start);
-  log("\n");
   for (uint32_t i = 0; i < program_length_bytes; i++) {
     ((uint8_t*)user_code)[i] = ((uint8_t*)mod_virtual_start)[i];
   }
-  log("Done copying code.\n");
 
-  log("Disabling hardware interrupts.\n");
   disable_hardware_interrupts();
 
-  log("Page directory starts as ");
-  print_uint32(LOG, (uint32_t) virtual_to_physical(PAGE_DIRECTORY_ADDRESS));
-  log("\n");
-  log("Setting page directory\n");
   set_page_directory(virtual_to_physical(pd));
-  log("Page directory physical address is now ");
-  print_uint32(LOG, (uint32_t) virtual_to_physical(PAGE_DIRECTORY_ADDRESS));
-  log("\n");
-
-  uint32_t* stack_highest_address = (uint32_t*) 0xbffffffb;
-  uint32_t value_on_stack = *stack_highest_address;
-  log("Value on stack: ");
-  print_uint32(LOG, value_on_stack);
-  log("\n");
 
   log("Entering user mode...\n");
   enter_user_mode();

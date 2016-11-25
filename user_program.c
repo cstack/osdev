@@ -15,7 +15,7 @@ int fib(unsigned int n) {
 int main() {
   int result = fib(20); // Should be 0x1a6d
 
-  write_to_screen("Hello World\n");
+  write_to_screen("\n----\nHello World!\n----\n");
 
   return result;
 }

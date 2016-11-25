@@ -133,8 +133,6 @@ void create_process(struct module* mod) {
   log("\n");
   for (uint32_t i = 0; i < program_length_bytes; i++) {
     ((uint8_t*)user_code)[i] = ((uint8_t*)mod_virtual_start)[i];
-    print_uint8(LOG, ((uint8_t*)mod_virtual_start)[i]);
-    log("\n");
   }
   log("Done copying code.\n");
 

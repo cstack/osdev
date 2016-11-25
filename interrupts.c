@@ -43,6 +43,28 @@ void log_interrupt_details(char* int_name, uint32_t error_code, uint32_t eip, st
   log("--------------------\n");
 }
 
+void sys_write_to_screen(char* s) {
+  log("sys_write_to_screen(");
+  print_uint32(LOG, (uint32_t) s);
+  log(")\n");
+  printf(s);
+}
+
+void handle_syscall(struct cpu_state* cpu) {
+  uint32_t syscall_num = cpu->eax;
+
+  switch (syscall_num) {
+    case (1):
+      sys_write_to_screen((char*) cpu->ebx);
+      break;
+    default:
+      log("Unknown syscall: ");
+      print_uint32(LOG, syscall_num);
+      log("\n");
+      while(1){}
+  }
+}
+
 void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t error_code, uint32_t eip) {
   switch(interrupt_number) {
     case(INT_KEYBOARD):
@@ -88,6 +110,7 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
 
     case(INT_SYSCALL):
       log_interrupt_details("INT_SYSCALL", error_code, eip, &cpu);
+      handle_syscall(&cpu);
       break;
 
     case(INT_OUT_OF_MEMORY):

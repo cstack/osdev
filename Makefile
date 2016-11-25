@@ -56,7 +56,7 @@ start_user_program.o: start_user_program.s
 user_program.o: user_program.c
 	$(GCC) $(CFLAGS) $< -o $@
 
-user_program.bin: user_program.o start_user_program.o
+user_program.bin: user_program.o start_user_program.o stdlib/assembly_functions.o
 	$(LD) -T link_user_program.ld -melf_i386 $^ -o $@
 
 os.iso: kernel.elf user_program.bin menu.lst

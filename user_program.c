@@ -1,3 +1,5 @@
+#include "stdlib/assembly_functions.h"
+
 int fib(unsigned int n) {
   if (n == 0) {
     return 0;
@@ -11,7 +13,9 @@ int fib(unsigned int n) {
 }
 
 int main() {
-  if (1) {
-    return fib(20); // Should return 0x1a6d
-  }
+  int result = fib(20); // Should be 0x1a6d
+
+  write_to_screen("Hello World\n");
+
+  return result;
 }

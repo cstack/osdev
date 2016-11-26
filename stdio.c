@@ -37,43 +37,7 @@ void write_string(write_byte_t write_byte, char* s) {
   }
 }
 
-enum format_string_mode {NORMAL, COMMAND};
-int fprintf (FILE stream, const char * format, ...) {
-  write_byte_t write_byte = write_byte_function(stream);
-
-  va_list vl;
-  va_start(vl,format);
-
-  int i = 0;
-  enum format_string_mode mode = NORMAL;
-  while (format[i]) {
-    switch (mode) {
-      case (NORMAL):
-        if (format[i] == '%') {
-          mode = COMMAND;
-        } else {
-          write_byte(format[i]);
-        }
-        break;
-      case (COMMAND):
-        if (format[i] == '%') {
-          write_byte('%');
-          mode = NORMAL;
-        } else if (format[i] == 's') {
-          write_string(write_byte, (char*) va_arg(vl,char*));
-          mode = NORMAL;
-        } else {
-          write_byte('?');
-          mode = NORMAL;
-        }
-        break;
-    }
-    i++;
-  }
-  return i;
-}
-
-void print_half_byte(write_byte_t write_byte, uint8_t half_byte) {
+void write_half_byte(write_byte_t write_byte, uint8_t half_byte, bool upcase) {
   switch (half_byte) {
     case 0x0:
       write_byte('0');
@@ -106,24 +70,80 @@ void print_half_byte(write_byte_t write_byte, uint8_t half_byte) {
       write_byte('9');
       break;
     case 0xA:
-      write_byte('A');
+      write_byte(upcase ? 'A' : 'a');
       break;
     case 0xB:
-      write_byte('B');
+      write_byte(upcase ? 'B' : 'b');
       break;
     case 0xC:
-      write_byte('C');
+      write_byte(upcase ? 'C' : 'c');
       break;
     case 0xD:
-      write_byte('D');
+      write_byte(upcase ? 'D' : 'd');
       break;
     case 0xE:
-      write_byte('E');
+      write_byte(upcase ? 'E' : 'e');
       break;
     case 0xF:
-      write_byte('F');
+      write_byte(upcase ? 'F' : 'f');
       break;
   }
+}
+
+enum format_string_mode {NORMAL, COMMAND};
+int fprintf (FILE stream, const char * format, ...) {
+  write_byte_t write_byte = write_byte_function(stream);
+
+  va_list vl;
+  va_start(vl,format);
+
+  int i = 0;
+  enum format_string_mode mode = NORMAL;
+  uint32_t vararg;
+  while (format[i]) {
+    switch (mode) {
+      case (NORMAL):
+        if (format[i] == '%') {
+          mode = COMMAND;
+        } else {
+          write_byte(format[i]);
+        }
+        break;
+      case (COMMAND):
+        if (format[i] == '%') {
+          write_byte('%');
+          mode = NORMAL;
+        } else if (format[i] == 'c') {
+          write_byte((uint32_t) va_arg(vl,uint32_t));
+          mode = NORMAL;
+        } else if (format[i] == 's') {
+          write_string(write_byte, (char*) va_arg(vl,char*));
+          mode = NORMAL;
+        } else if (format[i] == 'x') {
+          write_byte('0');
+          write_byte('x');
+          vararg = va_arg(vl,uint32_t);
+          for (int i = 7; i >=0; i--) {
+            write_half_byte(write_byte, (vararg >> (4*i)) & 0x0F, false);
+          }
+          mode = NORMAL;
+        } else if (format[i] == 'X') {
+          write_byte('0');
+          write_byte('x');
+          vararg = va_arg(vl,uint32_t);
+          for (int i = 7; i >=0; i--) {
+            write_half_byte(write_byte, (vararg >> (4*i)) & 0x0F, true);
+          }
+          mode = NORMAL;
+        } else {
+          write_byte('?');
+          mode = NORMAL;
+        }
+        break;
+    }
+    i++;
+  }
+  return i;
 }
 
 void print_uint8(FILE stream, uint8_t data) {
@@ -134,7 +154,7 @@ void print_uint8(FILE stream, uint8_t data) {
   write_byte('x');
   for (int i = 1; i >=0; i--) {
     half_byte = (data >> (4*i)) & 0x0F;
-    print_half_byte(write_byte, half_byte);
+    write_half_byte(write_byte, half_byte, true);
   }
 }
 
@@ -146,7 +166,7 @@ void print_uint16(FILE stream, uint16_t data) {
   write_byte('x');
   for (int i = 3; i >=0; i--) {
     half_byte = (data >> (4*i)) & 0x0F;
-    print_half_byte(write_byte, half_byte);
+    write_half_byte(write_byte, half_byte, true);
   }
 }
 
@@ -158,7 +178,7 @@ void print_uint32(FILE stream, uint32_t data) {
   write_byte('x');
   for (int i = 7; i >=0; i--) {
     half_byte = (data >> (4*i)) & 0x0F;
-    print_half_byte(write_byte, half_byte);
+    write_half_byte(write_byte, half_byte, true);
   }
 }
 

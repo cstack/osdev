@@ -144,7 +144,7 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   print_uint32(LOG, (uint32_t) sp);
   log("\n");
 
-  fprintf(LOG, "%%s -> %s\n", "test");
+  fprintf(LOG, "%%s -> %s, %%c -> %c, %%x -> %x, %%X -> %X\n", "test", 'A', 0xDEADBEEF, 0xDEADBEEF);
 
   log("- Creating a user process...\n");
   create_process(first_module(mbinfo));

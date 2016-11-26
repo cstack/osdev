@@ -2,6 +2,8 @@
 #include "drivers/frame_buffer.h"
 #include "drivers/serial_port.h"
 
+#include "stdarg.h"
+
 typedef void (*write_byte_t)(uint8_t);
 
 write_byte_t write_byte_function(FILE stream) {
@@ -28,9 +30,19 @@ void print_bytes(FILE stream, uint8_t * bytes, uint32_t num_bytes) {
   }
 }
 
+void write_string(write_byte_t write_byte, char* s) {
+  while(*s) {
+    write_byte(*s);
+    s++;
+  }
+}
+
 enum format_string_mode {NORMAL, COMMAND};
 int fprintf (FILE stream, const char * format, ...) {
   write_byte_t write_byte = write_byte_function(stream);
+
+  va_list vl;
+  va_start(vl,format);
 
   int i = 0;
   enum format_string_mode mode = NORMAL;
@@ -46,6 +58,9 @@ int fprintf (FILE stream, const char * format, ...) {
       case (COMMAND):
         if (format[i] == '%') {
           write_byte('%');
+          mode = NORMAL;
+        } else if (format[i] == 's') {
+          write_string(write_byte, (char*) va_arg(vl,char*));
           mode = NORMAL;
         } else {
           write_byte('?');

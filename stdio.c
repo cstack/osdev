@@ -90,6 +90,54 @@ void write_half_byte(write_byte_t write_byte, uint8_t half_byte, bool upcase) {
   }
 }
 
+void write_uint(write_byte_t write_byte, uint32_t value) {
+  char output[10];
+  for (int place = 0; place < 10; place++) {
+    output[place] = value % 10;
+    value = value / 10;
+  }
+
+  bool past_leading_zeroes = false;
+  for (int place = 10; place >= 0; place--) {
+    if (output[place] > 0) {
+      past_leading_zeroes = true;
+    }
+
+    if (past_leading_zeroes) {
+      write_byte(output[place] + '0');
+    }
+  }
+}
+
+void write_int(write_byte_t write_byte, int value) {
+  if (value < 0) {
+    write_byte('-');
+    value *= -1;
+  }
+  write_uint(write_byte, value);
+}
+
+void write_octal(write_byte_t write_byte, uint32_t value) {
+  write_byte('0');
+  write_byte('o');
+  bool past_leading_zeroes = false;
+  uint8_t part = (value >> 30) & 0b11;
+  if (part > 0) {
+    write_half_byte(write_byte, part, true);
+    past_leading_zeroes = true;
+  }
+  for (int i = 10; i >=0; i--) {
+    part = (value >> (3*i)) & 0b111;
+    if (part > 0) {
+      past_leading_zeroes = true;
+    }
+
+    if (past_leading_zeroes) {
+      write_half_byte(write_byte, part, true);
+    }
+  }
+}
+
 enum format_string_mode {NORMAL, COMMAND};
 int fprintf (FILE stream, const char * format, ...) {
   write_byte_t write_byte = write_byte_function(stream);
@@ -112,13 +160,16 @@ int fprintf (FILE stream, const char * format, ...) {
       case (COMMAND):
         if (format[i] == '%') {
           write_byte('%');
-          mode = NORMAL;
         } else if (format[i] == 'c') {
           write_byte((uint32_t) va_arg(vl,uint32_t));
-          mode = NORMAL;
+        } else if (format[i] == 'i' || format[i] == 'd') {
+          write_int(write_byte, va_arg(vl, int));
+        } else if (format[i] == 'o') {
+          write_octal(write_byte, va_arg(vl, int));
         } else if (format[i] == 's') {
           write_string(write_byte, (char*) va_arg(vl,char*));
-          mode = NORMAL;
+        } else if (format[i] == 'u') {
+          write_uint(write_byte, va_arg(vl, uint32_t));
         } else if (format[i] == 'x') {
           write_byte('0');
           write_byte('x');
@@ -126,7 +177,6 @@ int fprintf (FILE stream, const char * format, ...) {
           for (int i = 7; i >=0; i--) {
             write_half_byte(write_byte, (vararg >> (4*i)) & 0x0F, false);
           }
-          mode = NORMAL;
         } else if (format[i] == 'X') {
           write_byte('0');
           write_byte('x');
@@ -134,11 +184,11 @@ int fprintf (FILE stream, const char * format, ...) {
           for (int i = 7; i >=0; i--) {
             write_half_byte(write_byte, (vararg >> (4*i)) & 0x0F, true);
           }
-          mode = NORMAL;
         } else {
           write_byte('?');
           mode = NORMAL;
         }
+        mode = NORMAL;
         break;
     }
     i++;

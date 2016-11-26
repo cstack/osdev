@@ -1,4 +1,4 @@
-#include "stdlib/assembly_functions.h"
+#include "stdlib/stdio.h"
 
 int fib(unsigned int n) {
   if (n == 0) {
@@ -15,7 +15,8 @@ int fib(unsigned int n) {
 int main() {
   int result = fib(20); // Should be 0x1a6d
 
-  write_to_screen("\n----\nHello World!\n----\n");
+  printf("\n----\nHello World!\n----\n");
+  printf("fib(20) -> %i\n", result);
 
   return result;
 }

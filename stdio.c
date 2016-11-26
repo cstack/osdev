@@ -95,7 +95,7 @@ void write_uint(write_byte_t write_byte, uint32_t value) {
   }
 
   bool past_leading_zeroes = false;
-  for (int place = 10; place >= 0; place--) {
+  for (int place = 9; place >= 0; place--) {
     if (output[place] > 0) {
       past_leading_zeroes = true;
     }

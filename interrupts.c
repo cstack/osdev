@@ -93,6 +93,7 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       if (error_code & 0b10000) {
         fprintf(LOG, "- caused by an instruction fetch.\n");
       }
+      while(1){}
       break;
 
     case(INT_SOFTWARE):

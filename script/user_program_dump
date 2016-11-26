@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+raw = `xxd user_program.bin`
+
+lines = raw.split("\n")
+
+formatted_lines = lines.map do |line|
+  line[9,41].tr(' ', '')
+end
+
+puts formatted_lines.join("").gsub(/(.{2})/, '\1 ')

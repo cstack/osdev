@@ -60,89 +60,71 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   printf(welcome_string);
 
   serial_init();
-  log("\n--------------------\ncstackOS is booting!\n--------------------\n\n");
+  fprintf(LOG, "\n--------------------\ncstackOS is booting!\n--------------------\n\n");
 
   #ifdef DEBUG
-  log("\nMultiboot info passed to kernel from GRUB:\n");
+  fprintf(LOG, "\nMultiboot info passed to kernel from GRUB:\n");
   print_multiboot_info(LOG, mbinfo);
-  log("\n");
+  fprintf(LOG, "\n");
   #endif
 
-  log("- Initializing symbol table...\n");
+  fprintf(LOG, "- Initializing symbol table...\n");
   if (load_symbol_table(get_elf_section(mbinfo, ".symtab"), get_elf_section(mbinfo, ".strtab"))) {
-    log("  - done\n");
+    fprintf(LOG, "  - done\n");
   } else {
-    log("ERROR: Could not initialize symbol table.\n");
+    fprintf(LOG, "ERROR: Could not initialize symbol table.\n");
     while(1){}
   }
 
-  log("- Initializing global descriptor table...\n");
+  fprintf(LOG, "- Initializing global descriptor table...\n");
   initialize_gdt();
-  log("  - done\n");
+  fprintf(LOG, "  - done\n");
 
-  log("- Initializing interrupt descriptor table...\n");
+  fprintf(LOG, "- Initializing interrupt descriptor table...\n");
   initialize_idt();
-  log("  - done\n");
+  fprintf(LOG, "  - done\n");
 
-  log("- Issuing test interrupt...\n");
+  fprintf(LOG, "- Issuing test interrupt...\n");
   interrupt();
-  log("  - done\n");
+  fprintf(LOG, "  - done\n");
 
-  log("- Initializing programable interrupt controller...\n");
+  fprintf(LOG, "- Initializing programable interrupt controller...\n");
   pic_init();
-  log("  - done\n");
+  fprintf(LOG, "  - done\n");
 
-  log("- Initializing page allocator...\n");
+  fprintf(LOG, "- Initializing page allocator...\n");
   uint32_t free_pages = initialize_page_allocator(kernel_memory, mbinfo);
-  log("  - done\n");
-  log("  - ");
-  print_uint32(LOG, free_pages);
-  log(" free pages (");
-  print_uint32(LOG, free_pages / 256);
-  log(" MB)\n");
+  fprintf(LOG, "  - done\n");
+  fprintf(LOG, "  - %x  free pages (%i MB)\n", free_pages, free_pages/256);
 
-  log("- Initializing page directory...\n");
+  fprintf(LOG, "- Initializing page directory...\n");
   page_directory_t pd = initialize_kernel_page_directory();
-  log("  - done\n");
-  log("  - Address of page directory: ");
-  print_uint32(LOG, (uint32_t) pd);
-  log("\n");
+  fprintf(LOG, "  - done\n");
+  fprintf(LOG, "  - Address of page directory: %x\n", (uint32_t) pd);
   uint32_t num_pages = num_present_pages(pd);
-  log("  - ");
-  print_uint32(LOG, num_pages);
-  log(" present pages\n");
+  fprintf(LOG, "  - %i present pages\n", num_pages);
 
-  log("- Triggering a page fault...\n");
+  fprintf(LOG, "- Triggering a page fault...\n");
   uint32_t value = trigger_page_fault();
-  log("  - done\n");
-  log("  - value at unmapped address was ");
-  print_uint32(LOG, value);
-  log("\n");
+  fprintf(LOG, "  - done\n");
+  fprintf(LOG, "  - value at unmapped address was %x\n", value);
 
-  log("- Initializing task state segment...\n");
+  fprintf(LOG, "- Initializing task state segment...\n");
   initialize_tss();
-  log("  - done\n");
+  fprintf(LOG, "  - done\n");
 
-  log("- Dynamically allocating a struct...\n");
+  fprintf(LOG, "- Dynamically allocating a struct...\n");
   struct test_struct_t* test = (struct test_struct_t*) malloc(sizeof(struct test_struct_t));
-  log("  - done\n");
-  log("  - address is: ");
-  print_uint32(LOG, (uint32_t) test);
-  log("\n");
+  fprintf(LOG, "  - done\n");
+  fprintf(LOG, "  - address is: %x\n", (uint32_t) test);
   
   uint32_t local = 0xDEADBEEF;
 
-  log("  - local variable at: ");
-  print_uint32(LOG, (uint32_t) &local);
-  log("\n");
-  log("  - local variable value: ");
-  print_uint32(LOG, (uint32_t) local);
-  log("\n");
+  fprintf(LOG, "  - local variable at: %x\n", (uint32_t) &local);
+  fprintf(LOG, "  - local variable value: %x\n", (uint32_t) local);
 
   void* sp = current_stack_pointer();
-  log("  - stack pointer is: ");
-  print_uint32(LOG, (uint32_t) sp);
-  log("\n");
+  fprintf(LOG, "  - stack pointer is: %x\n", (uint32_t) sp);
 
   fprintf(
     LOG,
@@ -150,9 +132,9 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
     "test", 'A', 0xDEADBEEF, 0xDEADBEEF, 12345, -12345, 12345
   );
 
-  log("- Creating a user process...\n");
+  fprintf(LOG, "- Creating a user process...\n");
   create_process(first_module(mbinfo));
-  log("  - done\n");
+  fprintf(LOG, "  - done\n");
 
   // Loop forever
   // User input is accepted asynchronously via interrupts

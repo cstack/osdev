@@ -15,28 +15,6 @@ write_byte_t write_byte_function(FILE stream) {
   }
 }
 
-void print_char(FILE stream, char c) {
-  write_byte_t write_byte = write_byte_function(stream);
-  write_byte(c);
-}
-
-void print_bytes(FILE stream, uint8_t * bytes, uint32_t num_bytes) {
-  write_byte_t write_byte = write_byte_function(stream);
-  if (num_bytes == 0) { return; }
-  print_uint8(stream, bytes[0]);
-  for (uint32_t i=1; i < num_bytes; i++) {
-    write_byte(' ');
-    print_uint8(stream, bytes[i]);
-  }
-}
-
-void write_string(write_byte_t write_byte, char* s) {
-  while(*s) {
-    write_byte(*s);
-    s++;
-  }
-}
-
 void write_half_byte(write_byte_t write_byte, uint8_t half_byte, bool upcase) {
   switch (half_byte) {
     case 0x0:
@@ -87,6 +65,25 @@ void write_half_byte(write_byte_t write_byte, uint8_t half_byte, bool upcase) {
     case 0xF:
       write_byte(upcase ? 'F' : 'f');
       break;
+  }
+}
+
+void print_uint8(FILE stream, uint8_t data) {
+  write_byte_t write_byte = write_byte_function(stream);
+
+  uint8_t half_byte;
+  write_byte('0');
+  write_byte('x');
+  for (int i = 1; i >=0; i--) {
+    half_byte = (data >> (4*i)) & 0x0F;
+    write_half_byte(write_byte, half_byte, true);
+  }
+}
+
+void write_string(write_byte_t write_byte, char* s) {
+  while(*s) {
+    write_byte(*s);
+    s++;
   }
 }
 
@@ -194,42 +191,6 @@ int fprintf (FILE stream, const char * format, ...) {
     i++;
   }
   return i;
-}
-
-void print_uint8(FILE stream, uint8_t data) {
-  write_byte_t write_byte = write_byte_function(stream);
-
-  uint8_t half_byte;
-  write_byte('0');
-  write_byte('x');
-  for (int i = 1; i >=0; i--) {
-    half_byte = (data >> (4*i)) & 0x0F;
-    write_half_byte(write_byte, half_byte, true);
-  }
-}
-
-void print_uint16(FILE stream, uint16_t data) {
-  write_byte_t write_byte = write_byte_function(stream);
-
-  uint8_t half_byte;
-  write_byte('0');
-  write_byte('x');
-  for (int i = 3; i >=0; i--) {
-    half_byte = (data >> (4*i)) & 0x0F;
-    write_half_byte(write_byte, half_byte, true);
-  }
-}
-
-void print_uint32(FILE stream, uint32_t data) {
-  write_byte_t write_byte = write_byte_function(stream);
-
-  uint8_t half_byte;
-  write_byte('0');
-  write_byte('x');
-  for (int i = 7; i >=0; i--) {
-    half_byte = (data >> (4*i)) & 0x0F;
-    write_half_byte(write_byte, half_byte, true);
-  }
 }
 
 int printf (const char * format, ...) {

@@ -10,25 +10,18 @@
 #include "stdio.h"
 
 void log_stack_trace_line(uint32_t eip) {
-  print_uint32(LOG, eip);
-  log(" : ");
   char * symbol_name = address_to_symbol_name(eip);
-  fprintf(LOG, symbol_name);
-  log("\n");
+  fprintf(LOG, "%x : %s\n", eip, symbol_name);
 }
 
 void log_interrupt_details(char* int_name, uint32_t error_code, uint32_t eip, struct cpu_state* cpu) {
   if(cpu->ebp){}
-  log("--------------------\n");
+  fprintf(LOG, "--------------------\n");
 
-  log("Interrupt : ");
-  log(int_name);
-  log("\n");
-  log("error_code: ");
-  print_uint32(LOG, error_code);
-  log("\n");
+  fprintf(LOG, "Interrupt: %s\n", int_name);
+  fprintf(LOG, "error_code: %x\n", error_code);
 
-  log("\nStack trace:\n");
+  fprintf(LOG, "\nStack trace:\n");
   eip -= 4; // eip actually points one past the instruction that triggered interrupt
   log_stack_trace_line(eip);
   uint32_t ebp = cpu->ebp;
@@ -40,13 +33,11 @@ void log_interrupt_details(char* int_name, uint32_t error_code, uint32_t eip, st
     ebp = *((uint32_t*)ebp);
   }
 
-  log("--------------------\n");
+  fprintf(LOG, "--------------------\n");
 }
 
 void sys_write_to_screen(char* s) {
-  log("sys_write_to_screen(");
-  print_uint32(LOG, (uint32_t) s);
-  log(")\n");
+  fprintf(LOG, "sys_write_to_screen(%x)\n", (uint32_t) s);
   printf(s);
 }
 
@@ -58,9 +49,7 @@ void handle_syscall(struct cpu_state* cpu) {
       sys_write_to_screen((char*) cpu->ebx);
       break;
     default:
-      log("Unknown syscall: ");
-      print_uint32(LOG, syscall_num);
-      log("\n");
+      fprintf(LOG, "Unknown syscall: %x\n", syscall_num);
       while(1){}
   }
 }
@@ -77,30 +66,28 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
         page_in((void*) cpu.cr2);
         break;
       }
-      log("Interrupt was a page fault. Here's what I know:\n");
-      log("- Tried to access virtual address ");
-      print_uint32(LOG, cpu.cr2);
-      log("\n");
+      fprintf(LOG, "Interrupt was a page fault. Here's what I know:\n");
+      fprintf(LOG, "- Tried to access virtual address %x\n", cpu.cr2);
       if (error_code & 0b1) {
-        log("- Couldn't complete because of page-protection violation\n");
+        fprintf(LOG, "- Couldn't complete because of page-protection violation\n");
       } else {
-        log("- Couldn't complete because page was not present\n");
+        fprintf(LOG, "- Couldn't complete because page was not present\n");
       }
       if (error_code & 0b10) {
-        log("- This was an attempt to WRITE to this address.\n");
+        fprintf(LOG, "- This was an attempt to WRITE to this address.\n");
       } else {
-        log("- This was an attempt to READ from this address.\n");
+        fprintf(LOG, "- This was an attempt to READ from this address.\n");
       }
       if (error_code & 0b100) {
-        log("- Memory access came from user.\n");
+        fprintf(LOG, "- Memory access came from user.\n");
       } else {
-        log("- Memory access came from kernel.\n");
+        fprintf(LOG, "- Memory access came from kernel.\n");
       }
       if (error_code & 0b1000) {
-        log("- caused by reading a 1 in a reserved field.\n");
+        fprintf(LOG, "- caused by reading a 1 in a reserved field.\n");
       }
       if (error_code & 0b10000) {
-        log("- caused by an instruction fetch.\n");
+        fprintf(LOG, "- caused by an instruction fetch.\n");
       }
       break;
 
@@ -119,9 +106,7 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       break;
 
     default:
-      log("ERROR: Unable to handle interrupt: ");
-      print_uint32(LOG, interrupt_number);
-      log("\n");
+      fprintf(LOG, "ERROR: Unable to handle interrupt: %x\n", interrupt_number);
       log_interrupt_details("INT_UNKNOWN", error_code, eip, &cpu);
       while(1){}
       break;

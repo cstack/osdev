@@ -10,12 +10,8 @@ uint32_t p_to_v(uint32_t physical_address) {
 void print_module_info(FILE stream, struct module * m) {
   fprintf(stream, (char*) (p_to_v(m->string)));
   fprintf(stream, ":\n");
-  fprintf(stream, "mod_start (virtual): ");
-  print_uint32(stream, p_to_v(m->mod_start));
-  fprintf(stream, "\n");
-  fprintf(stream, "mod_end (virtual): ");
-  print_uint32(stream, p_to_v(m->mod_end));
-  fprintf(stream, "\n");
+  fprintf(stream, "mod_start (virtual): %x\n", p_to_v(m->mod_start));
+  fprintf(stream, "mod_end (virtual): %x\n", p_to_v(m->mod_end));
 }
 
 struct elf_section_header_t * get_elf_section(multiboot_info_t* info, char * section_name) {
@@ -55,12 +51,8 @@ void print_elf_section_header_table(FILE stream, elf_section_header_table_t tabl
 
   for (uint32_t i = 0; i < num; i++) {
     uint32_t sh_addr = section_header_table[i].sh_addr;
-    print_uint32(stream, sh_addr);
+    fprintf(stream, "%x : %x : ", sh_addr, section_header_table[i].sh_size);
 
-    fprintf(stream, " : ");
-    print_uint32(stream, section_header_table[i].sh_size);
-
-    fprintf(stream, " : ");
     uint32_t sh_name = section_header_table[i].sh_name;
     if (sh_name != 0) {
       char * name = (char*) (string_table_start + sh_name);
@@ -78,55 +70,23 @@ void print_memory_map(FILE stream, multiboot_info_t* info) {
   uint32_t num_entries = info->mmap_length / sizeof(memory_map_t);
 
   for (uint32_t i = 0; i < num_entries; i++) {
-    fprintf(stream, "base_addr_low: ");
-    print_uint32(stream, memory_map[i].base_addr_low);
-    fprintf(stream, "\n");
-
-    fprintf(stream, "base_addr_high: ");
-    print_uint32(stream, memory_map[i].base_addr_high);
-    fprintf(stream, "\n");
-
-    fprintf(stream, "length_low: ");
-    print_uint32(stream, memory_map[i].length_low);
-    fprintf(stream, "\n");
-
-    fprintf(stream, "length_high: ");
-    print_uint32(stream, memory_map[i].length_high);
-    fprintf(stream, "\n");
-
-    fprintf(stream, "type: ");
-    print_uint32(stream, memory_map[i].type);
-    fprintf(stream, "\n");
-
+    fprintf(stream, "base_addr_low: %x\n", memory_map[i].base_addr_low);
+    fprintf(stream, "base_addr_high: %x\n", memory_map[i].base_addr_high);
+    fprintf(stream, "length_low: %x\n", memory_map[i].length_low);
+    fprintf(stream, "length_high: %x\n", memory_map[i].length_high);
+    fprintf(stream, "type: %x\n", memory_map[i].type);
     fprintf(stream, "\n");
   }
 }
 
 void print_multiboot_info(FILE stream, multiboot_info_t* info) {
-  fprintf(stream, "flags: ");
-  print_uint32(stream, info->flags);
-  fprintf(stream, "\n");
-
-  fprintf(stream, "mem_lower (kilobytes): ");
-  print_uint32(stream, info->mem_lower);
-  fprintf(stream, "\n");
-  fprintf(stream, "mem_upper (kilobytes): ");
-  print_uint32(stream, info->mem_upper);
-  fprintf(stream, "\n");
-
-  fprintf(stream, "boot_device: ");
-  print_uint32(stream, info->boot_device);
-  fprintf(stream, "\n");
-  fprintf(stream, "cmdline: ");
-  print_uint32(stream, info->cmdline);
-  fprintf(stream, "\n");
-
-  fprintf(stream, "mods_count: ");
-  print_uint32(stream, info->mods_count);
-  fprintf(stream, "\n");
-  fprintf(stream, "mods_addr (virtual): ");
-  print_uint32(stream, p_to_v(info->mods_addr));
-  fprintf(stream, "\n");
+  fprintf(stream, "flags: %x\n", info->flags);
+  fprintf(stream, "mem_lower (kilobytes): %i\n", info->mem_lower);
+  fprintf(stream, "mem_upper (kilobytes): %i\n", info->mem_upper);
+  fprintf(stream, "boot_device: %x\n", info->boot_device);
+  fprintf(stream, "cmdline: %x\n", info->cmdline);
+  fprintf(stream, "mods_count: %i\n", info->mods_count);
+  fprintf(stream, "mods_addr (virtual): %x\n", info->mods_addr);
 
   fprintf(stream, "\nGRUB modules: \n");
   struct module * modules;

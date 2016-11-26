@@ -323,10 +323,7 @@ void print_page_table(FILE file, const uint32_t* pt) {
   fprintf(file, "---\n");
   for (uint32_t i = 0; i < PAGE_SIZE_DWORDS; i++) {
     if (get_present_from_pte(pt[i])) {
-      print_uint32(file, i);
-      fprintf(file, " -> ");
-      print_uint32(file, pt[i] & (uint32_t) PAGE_DIRECTORY_ADDRESS);
-      fprintf(file, "\n");
+      fprintf(file, "%x -> %x\n", i, pt[i] & (uint32_t) PAGE_DIRECTORY_ADDRESS);
     }
   }
   fprintf(file, "---\n");

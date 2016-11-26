@@ -310,7 +310,7 @@ void keyboard_interrupt_handler() {
   }
 
   if (c != 0) {
-    print_char(LOG, c);
-    print_char(SCREEN, c);
+    fprintf(LOG, "%c", c);
+    fprintf(SCREEN, "%c", c);
   }
 }

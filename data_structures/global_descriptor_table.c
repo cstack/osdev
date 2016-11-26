@@ -77,8 +77,6 @@ struct gdt_description_structure_t {
 void initialize_tss() {
   uint32_t tss_base = (uint32_t) &tss;
   uint32_t tss_limit = sizeof(tss);
-  fprintf(LOG, "tss_base: %x\n", tss_base);
-  fprintf(LOG, "tss_limit: %x\n", tss_limit);
   gdt[TASK_STATE_SEGMENT_INDEX].limit_0_15 = tss_limit & 0xFFFF;
   gdt[TASK_STATE_SEGMENT_INDEX].base_0_15 = tss_base & 0xFFFF;
   gdt[TASK_STATE_SEGMENT_INDEX].base_16_23 = (tss_base & 0xFF0000) >> 16;
@@ -88,16 +86,6 @@ void initialize_tss() {
 
   tss.ss0 = KERNAL_DATA_SEGMENT_SELECTOR;
   tss.esp0 = ((uint32_t) &kernel_stack_lowest_address + KERNEL_STACK_SIZE) - 4;
-
-  log("KERNEL_STACK_SIZE: %x\n", (uint32_t) KERNEL_STACK_SIZE);
-
-  log("kernel_stack_lowest_address: %x\n", (uint32_t) kernel_stack_lowest_address);
-
-  log("&kernel_stack_lowest_address: %x\n", (uint32_t) (&kernel_stack_lowest_address));
-
-  log("tss.ss0: %x\n", tss.ss0);
-
-  log("tss.esp0: %x\n", tss.esp0);
 
   tss_flush();
 }

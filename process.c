@@ -98,6 +98,5 @@ void create_process(struct module* mod) {
 
   set_page_directory(virtual_to_physical(pd));
 
-  fprintf(LOG, "Entering user mode...\n");
   enter_user_mode();
 }

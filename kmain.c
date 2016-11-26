@@ -95,7 +95,7 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   fprintf(LOG, "- Initializing page allocator...\n");
   uint32_t free_pages = initialize_page_allocator(kernel_memory, mbinfo);
   fprintf(LOG, "  - done\n");
-  fprintf(LOG, "  - %x  free pages (%i MB)\n", free_pages, free_pages/256);
+  fprintf(LOG, "  - %i free pages (%i MB)\n", free_pages, free_pages/256);
 
   fprintf(LOG, "- Initializing page directory...\n");
   page_directory_t pd = initialize_kernel_page_directory();
@@ -116,19 +116,19 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   fprintf(LOG, "- Dynamically allocating a struct...\n");
   struct test_struct_t* test = (struct test_struct_t*) malloc(sizeof(struct test_struct_t));
   fprintf(LOG, "  - done\n");
-  fprintf(LOG, "  - address is: %x\n", (uint32_t) test);
+  fprintf(LOG, "  - address (on heap) is: %x\n", (uint32_t) test);
   
   uint32_t local = 0xDEADBEEF;
 
-  fprintf(LOG, "  - local variable at: %x\n", (uint32_t) &local);
-  fprintf(LOG, "  - local variable value: %x\n", (uint32_t) local);
+  fprintf(LOG, "  - local variable (on stack) at: %x\n", (uint32_t) &local);
 
   void* sp = current_stack_pointer();
   fprintf(LOG, "  - stack pointer is: %x\n", (uint32_t) sp);
 
+  fprintf(LOG, "- Testing format strings...\n");
   fprintf(
     LOG,
-    "%%s -> %s, %%c -> %c, %%x -> %x, %%X -> %X, %%u -> %u, %%i -> %i, %%o -> %o\n",
+    "  - %%s -> %s, %%c -> %c, %%x -> %x, %%X -> %X, %%u -> %u, %%i -> %i, %%o -> %o\n",
     "test", 'A', 0xDEADBEEF, 0xDEADBEEF, 12345, -12345, 12345
   );
 

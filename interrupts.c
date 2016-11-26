@@ -37,12 +37,14 @@ void log_interrupt_details(char* int_name, uint32_t error_code, uint32_t eip, st
 }
 
 void sys_write_to_screen(char* s) {
-  fprintf(LOG, "sys_write_to_screen(%x)\n", (uint32_t) s);
+  fprintf(LOG, "sys_write_to_screen(%s)\n", s);
   printf(s);
 }
 
 void handle_syscall(struct cpu_state* cpu) {
   uint32_t syscall_num = cpu->eax;
+
+  fprintf(LOG, "--------------------\nSYSCALL (%i)\n", syscall_num);
 
   switch (syscall_num) {
     case (1):
@@ -52,6 +54,8 @@ void handle_syscall(struct cpu_state* cpu) {
       fprintf(LOG, "Unknown syscall: %x\n", syscall_num);
       while(1){}
   }
+
+  fprintf(LOG, "--------------------\n");
 }
 
 void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t error_code, uint32_t eip) {
@@ -96,7 +100,6 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       break;
 
     case(INT_SYSCALL):
-      log_interrupt_details("INT_SYSCALL", error_code, eip, &cpu);
       handle_syscall(&cpu);
       break;
 

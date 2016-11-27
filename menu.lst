@@ -3,4 +3,4 @@ timeout=0
 
 title os
 kernel /boot/kernel.elf
-module /modules/user_program.bin
+module /modules/built_file_system

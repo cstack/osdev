@@ -6,3 +6,5 @@ iso/
 *.iso
 stage2_eltorito
 log/
+built_file_system
+TODO

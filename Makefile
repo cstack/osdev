@@ -29,6 +29,7 @@ drivers/frame_buffer.o \
 drivers/keyboard.o \
 drivers/pic.o \
 drivers/serial_port.o \
+filesystem.o \
 interrupts.o \
 kmain.o \
 multiboot_utils.o \
@@ -62,12 +63,15 @@ user_program.o: user_program.c
 user_program.bin: user_program.o start_user_program.o $(STDLIB)
 	$(LD) -T link_user_program.ld -melf_i386 $^ -o $@
 
-os.iso: kernel.elf user_program.bin menu.lst
+built_file_system: file_system_root/*
+	script/build_file_system
+
+os.iso: kernel.elf user_program.bin menu.lst built_file_system
 	mkdir -p iso/boot/grub              # create the folder structure
 	mkdir -p iso/modules
 	cp stage2_eltorito iso/boot/grub/   # copy the bootloader
 	cp kernel.elf iso/boot/             # copy the kernel
-	cp user_program.bin iso/modules			# copy the 'user' program
+	cp built_file_system iso/modules	  # copy the 'user' program
 	cp menu.lst iso/boot/grub           # copy the grub configuration file
 	mkisofs -R                              \
           -b boot/grub/stage2_eltorito    \
@@ -91,3 +95,4 @@ clean:
 	rm -f *.bin # flat binary executables
 	rm -f *.out
 	rm -rf iso/
+	rm built_file_system

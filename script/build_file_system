@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+dirname = "#{File.dirname(__FILE__)}/../file_system_root"
+f = File.open('built_file_system', 'w')
+Dir.foreach(dirname) do |item|
+  next if item == '.' or item == '..'
+  f2 = File.open("#{dirname}/#{item}")
+  f.write("FILE #{item} #{f2.size}\n")
+  f.write(f2.read)
+  f.write("\n")
+  f2.close
+end
+
+f.close

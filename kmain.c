@@ -6,6 +6,7 @@
 #include "drivers/frame_buffer.h"
 #include "drivers/pic.h"
 #include "drivers/serial_port.h"
+#include "filesystem.h"
 #include "multiboot_utils.h"
 #include "process.h"
 #include "stdio.h"
@@ -132,9 +133,18 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
     "test", 'A', 0xDEADBEEF, 0xDEADBEEF, 12345, -12345, 12345
   );
 
-  fprintf(LOG, "- Creating a user process...\n");
-  create_process(first_module(mbinfo));
+  fprintf(LOG, "- Loading file system from GRUB module...\n");
+  initialize_filesystem(first_module(mbinfo));
   fprintf(LOG, "  - done\n");
+
+  struct file_t* file = get_file();
+  fprintf(LOG, "Name of file: %s\n", file->name);
+  fprintf(LOG, "Size of file: %i\n", file->size);
+  fprintf(LOG, "Contents of file:\n----\n%s\n----\n", file->bytes);
+
+  // fprintf(LOG, "- Creating a user process...\n");
+  // create_process(first_module(mbinfo));
+  // fprintf(LOG, "  - done\n");
 
   // Loop forever
   // User input is accepted asynchronously via interrupts

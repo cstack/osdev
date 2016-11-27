@@ -64,7 +64,6 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       keyboard_interrupt_handler();
       break;
     case(INT_PAGE_FAULT):
-      log_interrupt_details("INT_PAGE_FAULT", error_code, eip, &cpu);
       if ((error_code & 0b1) == 0) {
         // Caused by page-not-present
         page_in((void*) cpu.cr2);

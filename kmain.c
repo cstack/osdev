@@ -138,9 +138,11 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   fprintf(LOG, "  - done\n");
 
   struct file_t* file = get_file();
-  fprintf(LOG, "Name of file: %s\n", file->name);
-  fprintf(LOG, "Size of file: %i\n", file->size);
-  fprintf(LOG, "Contents of file:\n----\n%s\n----\n", file->bytes);
+
+  while (file) {
+    fprintf(LOG, "%s (%i bytes)\n----\n%s\n----\n", file->name, file->size, file->bytes);
+    file = file->next_sibling;
+  }
 
   // fprintf(LOG, "- Creating a user process...\n");
   // create_process(first_module(mbinfo));

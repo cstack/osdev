@@ -1,13 +1,21 @@
 #!/usr/bin/env ruby
-dirname = "#{File.dirname(__FILE__)}/../file_system_root"
+
+def include_file(path, output_file)
+  f2 = File.open(path)
+  filename = path.split("/").last
+  output_file.write("FILE #{filename} #{f2.size}\n")
+  output_file.write(f2.read)
+  output_file.write("\n")
+  f2.close
+end
+
 f = File.open('built_file_system', 'w')
+include_file("#{File.dirname(__FILE__)}/../user_program.bin", f)
+
+dirname = "#{File.dirname(__FILE__)}/../file_system_root"
 Dir.foreach(dirname) do |item|
   next if item == '.' or item == '..'
-  f2 = File.open("#{dirname}/#{item}")
-  f.write("FILE #{item} #{f2.size}\n")
-  f.write(f2.read)
-  f.write("\n")
-  f2.close
+  include_file("#{dirname}/#{item}", f)
 end
 
 f.close

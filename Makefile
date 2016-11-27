@@ -63,7 +63,7 @@ user_program.o: user_program.c
 user_program.bin: user_program.o start_user_program.o $(STDLIB)
 	$(LD) -T link_user_program.ld -melf_i386 $^ -o $@
 
-built_file_system: file_system_root/*
+built_file_system: file_system_root/* user_program.bin
 	script/build_file_system
 
 os.iso: kernel.elf user_program.bin menu.lst built_file_system

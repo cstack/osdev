@@ -29,17 +29,18 @@ drivers/frame_buffer.o \
 drivers/keyboard.o \
 drivers/pic.o \
 drivers/serial_port.o \
-filesystem.o \
 interrupts.o \
+kernel_filesystem.o \
 kmain.o \
 multiboot_utils.o \
 process.o \
 stdio.o \
 stdlib.o \
-string.o
+string.o \
+syscalls.o
 
-STDLIB = stdlib/assembly_functions.o \
-stdlib/stdio.o
+STDLIB = stdlib/stdio.o \
+stdlib/syscalls.o
 
 all: os.iso
 

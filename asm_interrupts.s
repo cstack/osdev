@@ -772,7 +772,7 @@ global interrupt_handler_128
 interrupt_handler_128:
   push    dword 0
   push    dword 128
-  jmp     common_interrupt_handler
+  jmp     interrupt_handler_with_return_value
 
 global interrupt_handler_129
 interrupt_handler_129:
@@ -1563,6 +1563,36 @@ common_interrupt_handler:               ; the common parts of the generic interr
 
   ; pop error_code and interrupt_number off the stack
   add     esp, 8
+
+  ; return to the code that got interrupted
+  iret
+
+interrupt_handler_with_return_value:
+  push    eax
+  push    ebx
+  push    ecx
+  push    edx
+  push    esi
+  push    edi
+  push    ebp
+  mov     eax, cr2
+  push    eax
+
+  ; call the C function
+  call    interrupt_handler
+
+  ; restore the registers
+  add    esp, 4 ; cr2
+  pop    ebp
+  pop    edi
+  pop    esi
+  pop    edx
+  pop    ecx
+  pop    ebx
+  ; don't pop eax. It contains the return value
+
+  ; pop eax, error_code and interrupt_number off the stack
+  add     esp, 12
 
   ; return to the code that got interrupted
   iret

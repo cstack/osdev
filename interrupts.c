@@ -8,6 +8,7 @@
 #include "loader.h"
 #include "memory.h"
 #include "stdio.h"
+#include "syscalls.h"
 
 void log_stack_trace_line(uint32_t eip) {
   char * symbol_name = address_to_symbol_name(eip);
@@ -36,29 +37,7 @@ void log_interrupt_details(char* int_name, uint32_t error_code, uint32_t eip, st
   fprintf(LOG, "--------------------\n");
 }
 
-void sys_write_to_screen(char* s) {
-  fprintf(LOG, "sys_write_to_screen(%s)\n", s);
-  printf(s);
-}
-
-void handle_syscall(struct cpu_state* cpu) {
-  uint32_t syscall_num = cpu->eax;
-
-  fprintf(LOG, "--------------------\nSYSCALL (%i)\n", syscall_num);
-
-  switch (syscall_num) {
-    case (1):
-      sys_write_to_screen((char*) cpu->ebx);
-      break;
-    default:
-      fprintf(LOG, "Unknown syscall: %x\n", syscall_num);
-      while(1){}
-  }
-
-  fprintf(LOG, "--------------------\n");
-}
-
-void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t error_code, uint32_t eip) {
+uint32_t interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t error_code, uint32_t eip) {
   switch(interrupt_number) {
     case(INT_KEYBOARD):
       keyboard_interrupt_handler();
@@ -100,8 +79,7 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
       break;
 
     case(INT_SYSCALL):
-      handle_syscall(&cpu);
-      break;
+      return handle_syscall(&cpu);
 
     case(INT_OUT_OF_MEMORY):
       log_interrupt_details("INT_OUT_OF_MEMORY", error_code, eip, &cpu);
@@ -116,4 +94,6 @@ void interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint32_t
   }
 
   pic_acknowledge();
+
+  return 0;
 }

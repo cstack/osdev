@@ -1,4 +1,4 @@
-#include "filesystem.h"
+#include "kernel_filesystem.h"
 
 #include "memory.h"
 #include "stdio.h"
@@ -73,4 +73,8 @@ struct file_t* get_file(char* name) {
   }
 
   return 0;
+}
+
+struct file_t* get_first_file() {
+  return first_file;
 }

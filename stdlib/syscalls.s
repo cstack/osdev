@@ -8,3 +8,12 @@ write_to_screen:
   mov ebx, [esp+4]
   int 0x80
   ret                  ; return to the calling function
+
+global count_files
+; count_files
+; stack: [esp    ] return address
+count_files:
+  mov eax, 2
+  int 0x80
+  ret                  ; return to the calling function
+

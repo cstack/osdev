@@ -48,6 +48,7 @@ uint32_t interrupt_handler(struct cpu_state cpu, uint32_t interrupt_number, uint
         page_in((void*) cpu.cr2);
         break;
       }
+      log_interrupt_details("INT_PAGE_FAULT", error_code, eip, &cpu);
       fprintf(LOG, "Interrupt was a page fault. Here's what I know:\n");
       fprintf(LOG, "- Tried to access virtual address %x\n", cpu.cr2);
       if (error_code & 0b1) {

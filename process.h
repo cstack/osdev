@@ -3,7 +3,7 @@
 
 #include "multiboot.h"
 #include "types.h"
-#include "filesystem.h"
+#include "kernel_filesystem.h"
 
 void create_process(struct file_t* file);
 

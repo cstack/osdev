@@ -17,3 +17,12 @@ count_files:
   int 0x80
   ret                  ; return to the calling function
 
+global list_files
+; list_files
+; stack: [esp + 4] address of buffer
+;        [esp    ] return address
+list_files:
+  mov eax, 3
+  mov ebx, [esp+4]
+  int 0x80
+  ret                  ; return to the calling function

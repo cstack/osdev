@@ -6,7 +6,7 @@
 #include "drivers/frame_buffer.h"
 #include "drivers/pic.h"
 #include "drivers/serial_port.h"
-#include "filesystem.h"
+#include "kernel_filesystem.h"
 #include "multiboot_utils.h"
 #include "process.h"
 #include "stdio.h"

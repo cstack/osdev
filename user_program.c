@@ -1,5 +1,6 @@
 #include "stdlib/stdio.h"
 #include "stdlib/syscalls.h"
+#include "stdlib/filesystem.h"
 
 int fib(unsigned int n) {
   if (n == 0) {
@@ -19,15 +20,15 @@ int main() {
   printf("\n----\nHello World!\n----\n");
   printf("fib(20) -> %i\n", result);
 
-  uint32_t num_files = count_files();
-  // struct file_t* files = malloc(sizeof(file_t));
-  // list_files(files);
+  struct file_t files[10];
 
+  uint32_t num_files = count_files();
   printf("\nFiles: %d\n", num_files);
-  // for (uint32_t i = 0; i < num_files; i++) {
-  //   file_t* file = files[i];
-  //   printf("%s\n", file->name);
-  // }
+  list_files(files);
+
+  for (uint32_t i = 0; i < num_files; i++) {
+    printf("%s\n", files[i].name);
+  }
 
   return result;
 }

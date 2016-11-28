@@ -36,3 +36,16 @@ int strncmp (const char * str1, const char * str2, uint32_t num) {
 
   return *str1 - *str2;
 }
+
+void* memcpy (void* dest, const void* src, uint32_t count) {
+  char* dest_byte = (char*) dest;
+  char* src_byte = (char*) src;
+
+  for (uint32_t i = 0; i < count; i++) {
+    *dest_byte = *src_byte;
+    dest_byte++;
+    src_byte++;
+  }
+
+  return dest;
+}

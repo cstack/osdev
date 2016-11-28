@@ -13,7 +13,7 @@ struct process_t {
   page_directory_t pd;
 };
 
-void create_process(struct module* mod) {
+void create_process(struct file_t* file) {
   struct process_t* p = malloc(sizeof(struct process_t));
   p->pid = next_pid;
   next_pid += 1;
@@ -87,11 +87,8 @@ void create_process(struct module* mod) {
 
   map_kernel_into_page_directory(pd);
 
-  uint32_t program_length_bytes = mod->mod_end - mod->mod_start;
-  void* mod_virtual_start = (void*) (mod->mod_start + UPPER_GB_START);
-
-  for (uint32_t i = 0; i < program_length_bytes; i++) {
-    ((uint8_t*)user_code)[i] = ((uint8_t*)mod_virtual_start)[i];
+  for (uint32_t i = 0; i < file->size; i++) {
+    ((char*)user_code)[i] = (file->bytes)[i];
   }
 
   disable_hardware_interrupts();

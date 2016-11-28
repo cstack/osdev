@@ -62,6 +62,15 @@ void initialize_filesystem(struct module* mod) {
   }
 }
 
-struct file_t* get_file() {
-  return first_file;
+struct file_t* get_file(char* name) {
+  struct file_t* file = first_file;
+
+  while (file) {
+    if (strcmp(file->name, name) == 0) {
+      return file;
+    }
+    file = file->next_sibling;
+  }
+
+  return 0;
 }

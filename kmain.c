@@ -137,16 +137,11 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   initialize_filesystem(first_module(mbinfo));
   fprintf(LOG, "  - done\n");
 
-  struct file_t* file = get_file();
+  struct file_t* file = get_file("user_program.bin");
 
-  while (file) {
-    fprintf(LOG, "%s (%i bytes)\n----\n%s\n----\n", file->name, file->size, file->bytes);
-    file = file->next_sibling;
-  }
-
-  // fprintf(LOG, "- Creating a user process...\n");
-  // create_process(first_module(mbinfo));
-  // fprintf(LOG, "  - done\n");
+  fprintf(LOG, "- Creating a user process...\n");
+  create_process(file);
+  fprintf(LOG, "  - done\n");
 
   // Loop forever
   // User input is accepted asynchronously via interrupts

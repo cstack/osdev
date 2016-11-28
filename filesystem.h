@@ -13,6 +13,6 @@ struct file_t {
 };
 
 void initialize_filesystem(struct module* mbinfo);
-struct file_t* get_file();
+struct file_t* get_file(char* name);
 
 #endif /* INCLUDE_FILESYSTEM_H */

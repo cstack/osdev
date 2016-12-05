@@ -1,4 +1,5 @@
-#include "stdio.h"
+#include "kernel_stdio.h"
+
 #include "drivers/frame_buffer.h"
 #include "drivers/serial_port.h"
 
@@ -15,7 +16,7 @@ write_byte_t write_byte_function(FILE stream) {
   }
 }
 
-void write_half_byte(write_byte_t write_byte, uint8_t half_byte, bool upcase) {
+void kernel_write_half_byte(write_byte_t write_byte, uint8_t half_byte, bool upcase) {
   switch (half_byte) {
     case 0x0:
       write_byte('0');
@@ -68,26 +69,14 @@ void write_half_byte(write_byte_t write_byte, uint8_t half_byte, bool upcase) {
   }
 }
 
-void print_uint8(FILE stream, uint8_t data) {
-  write_byte_t write_byte = write_byte_function(stream);
-
-  uint8_t half_byte;
-  write_byte('0');
-  write_byte('x');
-  for (int i = 1; i >=0; i--) {
-    half_byte = (data >> (4*i)) & 0x0F;
-    write_half_byte(write_byte, half_byte, true);
-  }
-}
-
-void write_string(write_byte_t write_byte, char* s) {
+void kernel_write_string(write_byte_t write_byte, char* s) {
   while(*s) {
     write_byte(*s);
     s++;
   }
 }
 
-void write_uint(write_byte_t write_byte, uint32_t value) {
+void kernel_write_uint(write_byte_t write_byte, uint32_t value) {
   char output[10];
   for (int place = 0; place < 10; place++) {
     output[place] = value % 10;
@@ -106,21 +95,21 @@ void write_uint(write_byte_t write_byte, uint32_t value) {
   }
 }
 
-void write_int(write_byte_t write_byte, int value) {
+void kernel_write_int(write_byte_t write_byte, int value) {
   if (value < 0) {
     write_byte('-');
     value *= -1;
   }
-  write_uint(write_byte, value);
+  kernel_write_uint(write_byte, value);
 }
 
-void write_octal(write_byte_t write_byte, uint32_t value) {
+void kernel_write_octal(write_byte_t write_byte, uint32_t value) {
   write_byte('0');
   write_byte('o');
   bool past_leading_zeroes = false;
   uint8_t part = (value >> 30) & 0b11;
   if (part > 0) {
-    write_half_byte(write_byte, part, true);
+    kernel_write_half_byte(write_byte, part, true);
     past_leading_zeroes = true;
   }
   for (int i = 10; i >=0; i--) {
@@ -130,7 +119,7 @@ void write_octal(write_byte_t write_byte, uint32_t value) {
     }
 
     if (past_leading_zeroes) {
-      write_half_byte(write_byte, part, true);
+      kernel_write_half_byte(write_byte, part, true);
     }
   }
 }
@@ -160,26 +149,26 @@ int fprintf (FILE stream, const char * format, ...) {
         } else if (format[i] == 'c') {
           write_byte((uint32_t) va_arg(vl,uint32_t));
         } else if (format[i] == 'i' || format[i] == 'd') {
-          write_int(write_byte, va_arg(vl, int));
+          kernel_write_int(write_byte, va_arg(vl, int));
         } else if (format[i] == 'o') {
-          write_octal(write_byte, va_arg(vl, int));
+          kernel_write_octal(write_byte, va_arg(vl, int));
         } else if (format[i] == 's') {
-          write_string(write_byte, (char*) va_arg(vl,char*));
+          kernel_write_string(write_byte, (char*) va_arg(vl,char*));
         } else if (format[i] == 'u') {
-          write_uint(write_byte, va_arg(vl, uint32_t));
+          kernel_write_uint(write_byte, va_arg(vl, uint32_t));
         } else if (format[i] == 'x') {
           write_byte('0');
           write_byte('x');
           vararg = va_arg(vl,uint32_t);
           for (int i = 7; i >=0; i--) {
-            write_half_byte(write_byte, (vararg >> (4*i)) & 0x0F, false);
+            kernel_write_half_byte(write_byte, (vararg >> (4*i)) & 0x0F, false);
           }
         } else if (format[i] == 'X') {
           write_byte('0');
           write_byte('x');
           vararg = va_arg(vl,uint32_t);
           for (int i = 7; i >=0; i--) {
-            write_half_byte(write_byte, (vararg >> (4*i)) & 0x0F, true);
+            kernel_write_half_byte(write_byte, (vararg >> (4*i)) & 0x0F, true);
           }
         } else {
           write_byte('?');
@@ -191,12 +180,4 @@ int fprintf (FILE stream, const char * format, ...) {
     i++;
   }
   return i;
-}
-
-int printf (const char * format, ...) {
-  return fprintf(SCREEN, format);
-}
-
-int log(char * format, ...) {
-  return fprintf(LOG, format);
 }

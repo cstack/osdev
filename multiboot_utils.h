@@ -2,7 +2,7 @@
 #define MULTIBOOT_UTILS_H
 
 #include "multiboot.h"
-#include "stdio.h"
+#include "kernel_stdio.h"
 #include "types.h"
 
 struct module* first_module(multiboot_info_t* info);

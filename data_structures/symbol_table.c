@@ -2,7 +2,7 @@
 
 #include "../loader.h"
 #include "../multiboot_utils.h"
-#include "../stdio.h"
+#include "../kernel_stdio.h"
 
 struct symbol_table_descriptor_t {
   bool present;

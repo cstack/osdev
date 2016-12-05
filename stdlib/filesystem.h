@@ -1,6 +1,8 @@
 #ifndef INCLUDE_FILESYSTEM_H
 #define INCLUDE_FILESYSTEM_H
 
+#include "types.h"
+
 #define FILE_NAME_MAX_LENGTH 63
 struct file_t {
   char name[FILE_NAME_MAX_LENGTH+1];

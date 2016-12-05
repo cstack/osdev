@@ -2,7 +2,7 @@
 
 #include "../assembly_interface.h"
 #include "../loader.h"
-#include "../stdio.h"
+#include "../kernel_stdio.h"
 #include "../memory.h"
 
 // A struct describing a Task State Segment.

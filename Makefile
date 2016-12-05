@@ -31,15 +31,15 @@ drivers/pic.o \
 drivers/serial_port.o \
 interrupts.o \
 kernel_filesystem.o \
+kernel_stdio.o \
+kernel_syscalls.o \
 kmain.o \
 multiboot_utils.o \
 process.o \
-stdio.o \
-stdlib.o \
-string.o \
-syscalls.o
+stdlib.o
 
 STDLIB = stdlib/stdio.o \
+stdlib/string.o \
 stdlib/syscalls.o
 
 all: os.iso
@@ -52,8 +52,8 @@ all: os.iso
 	# assemble s files with nasm
 	$(NASM) $(ASFLAGS) $< -o $@
 
-kernel.elf: $(OBJECTS)
-	$(LD) -T link.ld -melf_i386 $(OBJECTS) -o kernel.elf # Link to make an executable for the kernel.
+kernel.elf: $(OBJECTS) $(STDLIB)
+	$(LD) -T link.ld -melf_i386 $^ -o kernel.elf # Link to make an executable for the kernel.
 
 start_user_program.o: start_user_program.s
 	$(NASM) $(ASFLAGS) $< -o $@
@@ -96,4 +96,4 @@ clean:
 	rm -f *.bin # flat binary executables
 	rm -f *.out
 	rm -rf iso/
-	rm built_file_system
+	rm -f built_file_system

@@ -1,9 +1,9 @@
 #include "kernel_filesystem.h"
 
 #include "memory.h"
-#include "stdio.h"
+#include "kernel_stdio.h"
 #include "stdlib.h"
-#include "string.h"
+#include "stdlib/string.h"
 
 struct file_t* first_file;
 struct file_t* last_file;

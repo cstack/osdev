@@ -9,7 +9,7 @@
 #include "kernel_filesystem.h"
 #include "multiboot_utils.h"
 #include "process.h"
-#include "stdio.h"
+#include "kernel_stdio.h"
 #include "stdlib.h"
 #include "types.h"
 
@@ -58,7 +58,7 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
 
   clear_screen();
 
-  printf(welcome_string);
+  fprintf(SCREEN, welcome_string);
 
   serial_init();
   fprintf(LOG, "\n--------------------\ncstackOS is booting!\n--------------------\n\n");

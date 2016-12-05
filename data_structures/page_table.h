@@ -2,7 +2,7 @@
 #define INCLUDE_PAGE_TABLE_H
 
 #include "../multiboot.h"
-#include "../stdio.h"
+#include "../kernel_stdio.h"
 #include "../types.h"
 
 struct kernel_memory_descriptor_t {

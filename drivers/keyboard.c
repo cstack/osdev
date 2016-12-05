@@ -2,7 +2,7 @@
 
 #include "frame_buffer.h"
 #include "../assembly_interface.h"
-#include "../stdio.h"
+#include "../kernel_stdio.h"
 #include "../types.h"
 
 #define KBD_DATA_PORT   0x60
@@ -279,6 +279,40 @@ bool lshift_pressed;
 bool rshift_pressed;
 bool extended_scan_code;
 
+#define INPUT_BUFFER_SIZE 80
+uint8_t input_buffer_occupancy = 0;
+char input_buffer[INPUT_BUFFER_SIZE+1];
+
+void input_buffer_backspace() {
+  if (input_buffer_occupancy > 0) {
+    input_buffer_occupancy -= 1;
+    input_buffer[input_buffer_occupancy] = 0;
+  }
+}
+
+InputHandler input_handler = 0;
+
+void set_input_handler(InputHandler handler) {
+  input_handler = handler;
+}
+
+void append_to_input_buffer(char c) {
+  if (c == '\n') {
+    fprintf(LOG, "flush input buffer: %s\n", input_buffer);
+    if (input_handler != 0) {
+      input_handler(input_buffer);
+    }
+    input_buffer_occupancy = 0;
+    input_buffer[0] = 0;
+  } else if (input_buffer_occupancy < INPUT_BUFFER_SIZE) {
+    input_buffer[input_buffer_occupancy] = c;
+    input_buffer_occupancy += 1;
+    input_buffer[input_buffer_occupancy] = 0;
+  } else {
+    fprintf(LOG, "Error: dropped input because input buffer is full.\n");
+  }
+}
+
 uint8_t read_scan_code()
 {
   return inb(KBD_DATA_PORT);
@@ -298,6 +332,7 @@ void keyboard_interrupt_handler() {
   }
 
   if (scan_code == BACKSPACE) {
+    input_buffer_backspace();
     fb_backspace();
     return;
   }
@@ -312,5 +347,6 @@ void keyboard_interrupt_handler() {
   if (c != 0) {
     fprintf(LOG, "%c", c);
     fprintf(SCREEN, "%c", c);
+    append_to_input_buffer(c);
   }
 }

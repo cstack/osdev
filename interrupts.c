@@ -7,8 +7,8 @@
 #include "drivers/pic.h"
 #include "loader.h"
 #include "memory.h"
-#include "stdio.h"
-#include "syscalls.h"
+#include "kernel_stdio.h"
+#include "kernel_syscalls.h"
 
 void log_stack_trace_line(uint32_t eip) {
   char * symbol_name = address_to_symbol_name(eip);

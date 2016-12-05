@@ -1,11 +1,13 @@
-#include "syscalls.h"
+#include "kernel_syscalls.h"
 
+#include "drivers/keyboard.h"
 #include "kernel_filesystem.h"
-#include "stdio.h"
+#include "kernel_stdio.h"
+#include "stdlib/syscalls.h"
 
 uint32_t sys_write_to_screen(char* s) {
   fprintf(LOG, "sys_write_to_screen(%s)\n", s);
-  printf(s);
+  fprintf(SCREEN, s);
   return 0;
 }
 
@@ -31,6 +33,11 @@ uint32_t sys_list_files(struct file_t* buffer) {
   return 0;
 }
 
+uint32_t sys_register_input_handler(InputHandler handler) {
+  set_input_handler(handler);
+  return 0;
+}
+
 uint32_t handle_syscall(struct cpu_state* cpu) {
   uint32_t syscall_num = cpu->eax;
 
@@ -43,6 +50,8 @@ uint32_t handle_syscall(struct cpu_state* cpu) {
       return sys_count_files();
     case (3):
       return sys_list_files((struct file_t *) cpu->ebx);
+    case (4):
+      return sys_register_input_handler((InputHandler) cpu->ebx);
     default:
       fprintf(LOG, "Unknown syscall: %x\n", syscall_num);
       while(1){}

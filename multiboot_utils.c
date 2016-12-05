@@ -1,7 +1,7 @@
 #include "multiboot_utils.h"
 #include "elf.h"
 #include "loader.h"
-#include "string.h"
+#include "stdlib/string.h"
 
 uint32_t p_to_v(uint32_t physical_address) {
   return physical_address + (uint32_t) &KERNEL_VIRTUAL_BASE;

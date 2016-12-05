@@ -3,7 +3,7 @@
 #include "assembly_interface.h"
 #include "data_structures/page_table.h"
 #include "memory.h"
-#include "stdio.h"
+#include "kernel_stdio.h"
 #include "stdlib.h"
 
 uint32_t next_pid = 0;
@@ -90,8 +90,6 @@ void create_process(struct file_t* file) {
   for (uint32_t i = 0; i < file->size; i++) {
     ((char*)user_code)[i] = (file->bytes)[i];
   }
-
-  disable_hardware_interrupts();
 
   set_page_directory(virtual_to_physical(pd));
 

@@ -26,3 +26,13 @@ list_files:
   mov ebx, [esp+4]
   int 0x80
   ret                  ; return to the calling function
+
+global register_input_handler
+; register_input_handler
+; stack: [esp + 4] address of handler
+;        [esp    ] return address
+register_input_handler:
+  mov eax, 4
+  mov ebx, [esp+4]
+  int 0x80
+  ret                  ; return to the calling function

@@ -1,7 +1,7 @@
 #include "stdio.h"
 
-#include "assembly_functions.h"
 #include "stdarg.h"
+#include "syscalls.h"
 
 #define BUFFER_SIZE 128
 
@@ -96,6 +96,11 @@ void write_string(char* s, struct buffer_t* buffer) {
 }
 
 void write_uint(uint32_t value, struct buffer_t* buffer) {
+  if (value == 0) {
+    write_byte('0', buffer);
+    return;
+  }
+
   char output[10];
   for (int place = 0; place < 10; place++) {
     output[place] = value % 10;

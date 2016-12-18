@@ -130,7 +130,7 @@ void kmain(struct kernel_memory_descriptor_t kernel_memory, uint32_t ebx) {
   fprintf(
     LOG,
     "  - %%s -> %s, %%c -> %c, %%x -> %x, %%X -> %X, %%u -> %u, %%i -> %i, %%o -> %o\n",
-    "test", 'A', 0xDEADBEEF, 0xDEADBEEF, 12345, -12345, 12345
+    "test", 'A', 0xDEADBEEF, 0xDEADBEEF, 0, -12345, 12345
   );
 
   fprintf(LOG, "- Loading file system from GRUB module...\n");

@@ -77,6 +77,11 @@ void kernel_write_string(write_byte_t write_byte, char* s) {
 }
 
 void kernel_write_uint(write_byte_t write_byte, uint32_t value) {
+  if (value == 0) {
+    write_byte('0');
+    return;
+  }
+
   char output[10];
   for (int place = 0; place < 10; place++) {
     output[place] = value % 10;

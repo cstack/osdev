@@ -6,7 +6,6 @@
 #include "stdlib/syscalls.h"
 
 uint32_t sys_write_to_screen(char* s) {
-  fprintf(LOG, "sys_write_to_screen(%s)\n", s);
   fprintf(SCREEN, s);
   return 0;
 }
@@ -38,22 +37,35 @@ uint32_t sys_register_input_handler(InputHandler handler) {
   return 0;
 }
 
+char* syscall_name(Syscall syscall) {
+  switch (syscall) {
+    case (WRITE_TO_SCREEN):
+      return "WRITE_TO_SCREEN";
+    case (COUNT_FILES):
+      return "COUNT_FILES";
+    case (LIST_FILES):
+      return "LIST_FILES";
+    case (REGISTER_INPUT_HANDLER):
+      return "REGISTER_INPUT_HANDLER";
+  }
+}
+
 uint32_t handle_syscall(struct cpu_state* cpu) {
-  uint32_t syscall_num = cpu->eax;
+  Syscall syscall = (Syscall) cpu->eax;
 
-  fprintf(LOG, "--------------------\nSYSCALL (%i)\n", syscall_num);
+  fprintf(LOG, "--------------------\nSYSCALL (%i - %s)\n", syscall, syscall_name(syscall));
 
-  switch (syscall_num) {
-    case (1):
+  switch (syscall) {
+    case (WRITE_TO_SCREEN):
       return sys_write_to_screen((char*) cpu->ebx);
-    case (2):
+    case (COUNT_FILES):
       return sys_count_files();
-    case (3):
+    case (LIST_FILES):
       return sys_list_files((struct file_t *) cpu->ebx);
-    case (4):
+    case (REGISTER_INPUT_HANDLER):
       return sys_register_input_handler((InputHandler) cpu->ebx);
     default:
-      fprintf(LOG, "Unknown syscall: %x\n", syscall_num);
+      fprintf(LOG, "Unknown syscall: %x\n", syscall);
       while(1){}
   }
 

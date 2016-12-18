@@ -4,6 +4,14 @@
 #include "types.h"
 #include "filesystem.h"
 
+enum _Syscall {
+  WRITE_TO_SCREEN,
+  COUNT_FILES,
+  LIST_FILES,
+  REGISTER_INPUT_HANDLER
+};
+typedef enum _Syscall Syscall;
+
 void write_to_screen(char* s);
 uint32_t count_files();
 void list_files(struct file_t buffer[]);

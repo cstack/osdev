@@ -58,16 +58,16 @@ kernel.elf: $(OBJECTS) $(STDLIB)
 start_user_program.o: start_user_program.s
 	$(NASM) $(ASFLAGS) $< -o $@
 
-user_program.o: user_program.c
+shell.o: shell.c
 	$(GCC) $(CFLAGS) $< -o $@
 
-user_program.bin: user_program.o start_user_program.o $(STDLIB)
+shell.bin: shell.o start_user_program.o $(STDLIB)
 	$(LD) -T link_user_program.ld -melf_i386 $^ -o $@
 
-built_file_system: file_system_root/* user_program.bin
+built_file_system: file_system_root/* shell.bin
 	script/build_file_system
 
-os.iso: kernel.elf user_program.bin menu.lst built_file_system
+os.iso: kernel.elf shell.bin menu.lst built_file_system
 	mkdir -p iso/boot/grub              # create the folder structure
 	mkdir -p iso/modules
 	cp stage2_eltorito iso/boot/grub/   # copy the bootloader
